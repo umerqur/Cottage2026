@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import Home from './pages/Home'
 import Results from './pages/Results'
 import Admin from './pages/Admin'
+import Setup from './pages/Setup'
+import { isSupabaseConfigured } from './lib/supabase'
 
 function Navigation() {
   const location = useLocation()
@@ -52,6 +54,15 @@ function Navigation() {
 }
 
 function App() {
+  // If Supabase is not configured, show setup screen
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="min-h-screen bg-slate-900">
+        <Setup />
+      </div>
+    )
+  }
+
   return (
     <Router>
       <div className="min-h-screen bg-slate-900">

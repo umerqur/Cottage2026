@@ -4,7 +4,13 @@ import type { CottageOption, Vote, Ranking } from '../types'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Check if Supabase is configured
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey)
+
+// Only create client if both values exist
+export const supabase = isSupabaseConfigured
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null as any // Will never be used when not configured
 
 // Database types
 export interface Database {
@@ -194,4 +200,125 @@ export async function deleteAllRankings() {
     .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
 
   if (error) throw error
+}
+
+// Seed default options
+export async function seedDefaultOptions() {
+  const defaultOptions = [
+    {
+      code: 'A',
+      nickname: 'Option A',
+      title: 'Cottage Option A',
+      location: 'Ontario, Canada',
+      priceNight: 400,
+      totalEstimate: 1600,
+      guests: 8,
+      beds: 4,
+      baths: 2.0,
+      perks: ['Lake access', 'Fire pit', 'BBQ'],
+      airbnbUrl: 'https://airbnb.com',
+      imageUrls: ['/options/A.jpg'],
+      notes: 'Placeholder option A - edit via admin panel',
+    },
+    {
+      code: 'B',
+      nickname: 'Option B',
+      title: 'Cottage Option B',
+      location: 'Ontario, Canada',
+      priceNight: 400,
+      totalEstimate: 1600,
+      guests: 8,
+      beds: 4,
+      baths: 2.0,
+      perks: ['Lake access', 'Fire pit', 'BBQ'],
+      airbnbUrl: 'https://airbnb.com',
+      imageUrls: ['/options/B.jpg'],
+      notes: 'Placeholder option B - edit via admin panel',
+    },
+    {
+      code: 'C',
+      nickname: 'Option C',
+      title: 'Cottage Option C',
+      location: 'Ontario, Canada',
+      priceNight: 400,
+      totalEstimate: 1600,
+      guests: 8,
+      beds: 4,
+      baths: 2.0,
+      perks: ['Lake access', 'Fire pit', 'BBQ'],
+      airbnbUrl: 'https://airbnb.com',
+      imageUrls: ['/options/C.jpg'],
+      notes: 'Placeholder option C - edit via admin panel',
+    },
+    {
+      code: 'D',
+      nickname: 'Option D',
+      title: 'Cottage Option D',
+      location: 'Ontario, Canada',
+      priceNight: 400,
+      totalEstimate: 1600,
+      guests: 8,
+      beds: 4,
+      baths: 2.0,
+      perks: ['Lake access', 'Fire pit', 'BBQ'],
+      airbnbUrl: 'https://airbnb.com',
+      imageUrls: ['/options/D.jpg'],
+      notes: 'Placeholder option D - edit via admin panel',
+    },
+    {
+      code: 'E',
+      nickname: 'Option E',
+      title: 'Cottage Option E',
+      location: 'Ontario, Canada',
+      priceNight: 400,
+      totalEstimate: 1600,
+      guests: 8,
+      beds: 4,
+      baths: 2.0,
+      perks: ['Lake access', 'Fire pit', 'BBQ'],
+      airbnbUrl: 'https://airbnb.com',
+      imageUrls: ['/options/E.jpg'],
+      notes: 'Placeholder option E - edit via admin panel',
+    },
+    {
+      code: 'F',
+      nickname: 'Option F',
+      title: 'Cottage Option F',
+      location: 'Ontario, Canada',
+      priceNight: 400,
+      totalEstimate: 1600,
+      guests: 8,
+      beds: 4,
+      baths: 2.0,
+      perks: ['Lake access', 'Fire pit', 'BBQ'],
+      airbnbUrl: 'https://airbnb.com',
+      imageUrls: ['/options/F.jpg'],
+      notes: 'Placeholder option F - edit via admin panel',
+    },
+  ]
+
+  const results = []
+  for (const option of defaultOptions) {
+    try {
+      // Try to insert, but ignore if it already exists (code is unique)
+      const { data, error } = await supabase
+        .from('options')
+        .insert(option)
+        .select()
+        .single()
+
+      if (error && error.code !== '23505') { // 23505 is duplicate key error
+        throw error
+      }
+
+      if (data) {
+        results.push(data)
+      }
+    } catch (err) {
+      // Ignore duplicate key errors, but log others
+      console.error('Error seeding option:', option.code, err)
+    }
+  }
+
+  return results
 }

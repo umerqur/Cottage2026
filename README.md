@@ -7,19 +7,51 @@ A beautiful, mobile-first web application for group voting on cottage rental opt
 - **Gallery View**: Browse 6 cottage options with images, pricing, and amenities
 - **Smart Voting**: Vote Yes/Maybe/No on each option with persistent storage
 - **Top 2 Ranking**: Pick your top two choices with weighted points (1st = 2pts, 2nd = 1pt)
-- **Live Results**: See real-time vote tallies and leaderboard
-- **Admin Panel**: Manage cottage options and reset votes (password protected)
+- **Live Results**: See real-time vote tallies and leaderboard with shared group results
+- **Admin Panel**: Manage cottage options, seed defaults, and reset votes (password protected)
 - **Mobile First**: Premium UI optimized for phones and tablets
+- **Graceful Setup**: Shows helpful setup screen if Supabase env vars are missing
 
 ## Tech Stack
 
 - **Frontend**: React 18 + TypeScript + Vite
 - **Styling**: Tailwind CSS
-- **Backend**: Supabase (PostgreSQL database)
+- **Backend**: Supabase (PostgreSQL database) - for shared group results
 - **Hosting**: Netlify
 - **Routing**: React Router
 
-## Local Development Setup
+## Quick Setup (4 Steps)
+
+### 1. Create Supabase Project
+
+1. Go to [supabase.com](https://supabase.com) and create a free account
+2. Create a new project
+3. Wait for the project to finish setting up
+
+### 2. Run Database Schema
+
+1. In your Supabase dashboard, go to the **SQL Editor**
+2. Copy the entire contents of `supabase-schema.sql` from this repo
+3. Paste it into the SQL Editor and click **Run**
+4. This creates all tables with proper constraints and seeds 6 sample options
+
+### 3. Set Netlify Environment Variables
+
+1. Deploy to Netlify (connect your GitHub repo)
+2. In Netlify: **Site settings** → **Environment variables**
+3. Add these two required variables:
+   - `VITE_SUPABASE_URL` - Your Supabase project URL (find in Supabase → Settings → API)
+   - `VITE_SUPABASE_ANON_KEY` - Your Supabase anon/public key (find in Supabase → Settings → API)
+4. Optional: `VITE_ADMIN_PASSWORD` - Custom admin password (defaults to `cottage2026admin`)
+
+### 4. Redeploy
+
+1. In Netlify, go to **Deploys** → **Trigger deploy** → **Deploy site**
+2. Your app is now live with shared group results!
+
+**Note**: If env vars are missing, the app will show a helpful setup screen instead of crashing.
+
+## Local Development
 
 ### Prerequisites
 
@@ -27,108 +59,31 @@ A beautiful, mobile-first web application for group voting on cottage rental opt
 - A Supabase account (free tier works)
 - Git
 
-### 1. Clone and Install
+### Setup Steps
 
 ```bash
+# Clone and install
 git clone <your-repo-url>
 cd Cottage2026
 npm install
-```
 
-### 2. Set Up Supabase
+# Create .env file
+cp .env.example .env
 
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to the SQL Editor in your Supabase dashboard
-3. Copy the contents of `supabase-schema.sql` and run it
-4. This will create all necessary tables and sample data
+# Add your Supabase credentials to .env
+# VITE_SUPABASE_URL=https://your-project.supabase.co
+# VITE_SUPABASE_ANON_KEY=your-anon-key
+# VITE_ADMIN_PASSWORD=your-admin-password
 
-### 3. Configure Environment Variables
-
-1. Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Fill in your Supabase credentials in `.env`:
-   ```
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key
-   VITE_ADMIN_PASSWORD=your-chosen-admin-password
-   ```
-
-   You can find your Supabase URL and anon key in:
-   - Supabase Dashboard → Settings → API
-
-### 4. Add Cottage Images
-
-Place 6 cottage images in `/public/options/` named:
-- A.jpg
-- B.jpg
-- C.jpg
-- D.jpg
-- E.jpg
-- F.jpg
-
-These will be the default images for each option (you can override via admin panel later).
-
-### 5. Run Development Server
-
-```bash
+# Run dev server
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`
+The app will be available at `http://localhost:5173`
 
-## Deploying to Netlify
+### Add Cottage Images (Optional)
 
-### Option 1: Netlify CLI (Recommended)
-
-1. Install Netlify CLI:
-   ```bash
-   npm install -g netlify-cli
-   ```
-
-2. Login to Netlify:
-   ```bash
-   netlify login
-   ```
-
-3. Initialize and deploy:
-   ```bash
-   netlify init
-   ```
-
-   Follow the prompts to:
-   - Create a new site or link to existing
-   - Set build command: `npm run build`
-   - Set publish directory: `dist`
-
-4. Set environment variables in Netlify:
-   ```bash
-   netlify env:set VITE_SUPABASE_URL "your_supabase_url"
-   netlify env:set VITE_SUPABASE_ANON_KEY "your_anon_key"
-   netlify env:set VITE_ADMIN_PASSWORD "your_admin_password"
-   ```
-
-5. Deploy:
-   ```bash
-   netlify deploy --prod
-   ```
-
-### Option 2: Netlify Dashboard
-
-1. Push your code to GitHub
-2. Go to [Netlify](https://app.netlify.com)
-3. Click "Add new site" → "Import an existing project"
-4. Connect to your GitHub repo
-5. Configure build settings:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-6. Add environment variables in Site settings → Environment variables:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_ADMIN_PASSWORD`
-7. Deploy!
+Place 6 cottage images in `/public/options/` named A.jpg through F.jpg. These will be used as default images (you can update via admin panel later).
 
 ## Usage Guide
 
@@ -144,8 +99,9 @@ The app will be available at `http://localhost:3000`
 
 1. Go to `/admin`
 2. Enter the admin password
-3. Edit cottage details (nickname, pricing, amenities, etc.)
-4. Reset all votes if needed to start fresh
+3. **Seed default options**: Click "Seed Default Options (A-F)" to populate 6 placeholder cottages (only if options table is empty)
+4. **Edit cottage details**: Update nickname, pricing, amenities, images, etc.
+5. **Reset votes**: Clear all votes and rankings to start fresh
 
 ## Project Structure
 
@@ -181,15 +137,17 @@ Cottage2026/
 **options**
 - Stores the 6 cottage options with all details
 - Fields: code, nickname, title, location, pricing, capacity, perks, images, etc.
+- Unique constraint on `code` (A-F)
 
 **votes**
 - Stores individual votes (yes/maybe/no)
-- One vote per user per option
-- Unique constraint on (voterName, optionId)
+- **Unique constraint** on `(voterName, optionId)` - prevents duplicate votes
+- Uses **upsert logic** - updates existing vote instead of creating duplicates
 
 **rankings**
 - Stores top 2 picks for each user
-- One ranking per user
+- **Unique constraint** on `voterName` - one ranking per voter
+- Uses **upsert logic** - updates existing ranking instead of creating duplicates
 - Points: 1st place = 2pts, 2nd place = 1pt
 
 ## Customization
@@ -219,17 +177,26 @@ The app is designed for exactly 6 options (A-F). To add more:
 
 ## Troubleshooting
 
+**Seeing "Admin Setup Required" screen?**
+- This means Supabase environment variables are missing
+- Follow the setup screen instructions to add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to Netlify
+- Redeploy your site after adding the variables
+
+**No cottage options showing?**
+- Go to `/admin` and click "Seed Default Options (A-F)" to populate 6 placeholder cottages
+- Then edit them via the admin panel with real cottage details
+
 **Votes not saving?**
 - Check browser console for errors
-- Verify Supabase credentials in environment variables
-- Ensure Row Level Security policies are set correctly
+- Verify Supabase credentials are correct in environment variables
+- Ensure the database schema was run successfully in Supabase SQL Editor
 
 **Images not loading?**
-- Make sure images are in `/public/options/` with correct names
-- Check image URLs in the database (can be updated via admin panel)
+- Default images should be in `/public/options/` named A.jpg through F.jpg
+- You can update image URLs via the admin panel to use any hosted images
 
 **Admin password not working?**
-- Verify `VITE_ADMIN_PASSWORD` is set in environment variables
+- Default password is `cottage2026admin` if `VITE_ADMIN_PASSWORD` env var is not set
 - Remember to redeploy after changing environment variables on Netlify
 
 ## Support

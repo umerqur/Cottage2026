@@ -4,6 +4,7 @@ import {
   updateOption,
   deleteAllVotes,
   deleteAllRankings,
+  seedDefaultOptions,
 } from '../lib/supabase'
 import type { CottageOption } from '../types'
 
@@ -55,6 +56,24 @@ export default function Admin() {
     } catch (err) {
       console.error('Error resetting votes:', err)
       alert('Failed to reset votes. Check console for details.')
+    }
+  }
+
+  const handleSeedOptions = async () => {
+    if (!confirm('Seed 6 default options (A-F)? This will only add options that don\'t already exist.')) {
+      return
+    }
+
+    try {
+      setLoading(true)
+      const results = await seedDefaultOptions()
+      await loadOptions()
+      alert(`Seeded ${results.length} new options! Edit them via the form below.`)
+    } catch (err) {
+      console.error('Error seeding options:', err)
+      alert('Failed to seed options. Check console for details.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -324,7 +343,14 @@ export default function Admin() {
     <div>
       <h1 className="text-4xl font-bold text-white mb-8">Admin Dashboard</h1>
 
-      <div className="mb-8">
+      <div className="mb-8 flex gap-4 flex-wrap">
+        <button
+          onClick={handleSeedOptions}
+          disabled={loading}
+          className="bg-primary-600 hover:bg-primary-700 disabled:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-lg"
+        >
+          Seed Default Options (A-F)
+        </button>
         <button
           onClick={handleResetVotes}
           className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-lg"
