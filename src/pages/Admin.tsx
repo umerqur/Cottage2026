@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
   getOptions,
-  createOption,
   updateOption,
   deleteAllVotes,
   deleteAllRankings,
