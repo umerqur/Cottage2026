@@ -67,21 +67,6 @@ VALUES
     'https://www.airbnb.ca/rooms/39502464?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3vpS2cFSOgLqSMw&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34',
     ARRAY['/options/Paradise_Lake_House.png'],
     'Beautiful all-season lake house'
-  ),
-  (
-    'E',
-    'Eagle Point',
-    'Eagle Point, Eagle Lake',
-    'Ontario, Canada',
-    480,
-    1920,
-    7,
-    4,
-    2.0,
-    ARRAY['Sleeps 7', 'Eagle Lake', 'Scenic views', 'Waterfront'],
-    'https://www.airbnb.ca/rooms/1426867684446395623?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3fG2MkJ1fv8rexl&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34',
-    ARRAY['/options/placeholder.png'],
-    'Stunning Eagle Lake property - Image coming soon'
   )
 ON CONFLICT (code)
 DO UPDATE SET
@@ -101,5 +86,5 @@ DO UPDATE SET
 -- Verify the updates
 SELECT code, nickname, title, location, "priceNight", "totalEstimate", "airbnbUrl", "imageUrls"[1] as "primaryImage"
 FROM options
-WHERE code IN ('A', 'B', 'C', 'D', 'E')
+WHERE code IN ('A', 'B', 'C', 'D')
 ORDER BY code;
