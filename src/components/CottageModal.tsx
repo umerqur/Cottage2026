@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { CottageOption } from '../types'
 
 interface CottageModalProps {
@@ -6,7 +7,12 @@ interface CottageModalProps {
 }
 
 export default function CottageModal({ option, onClose }: CottageModalProps) {
+  const [imageError, setImageError] = useState(false)
+
   if (!option) return null
+
+  // Check if this is a TBD placeholder cottage
+  const isTBD = option.nickname === 'TBD' || option.title.includes('TBD')
 
   return (
     <div
@@ -18,11 +24,23 @@ export default function CottageModal({ option, onClose }: CottageModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
-          <img
-            src={option.imageUrls[0]}
-            alt={option.nickname}
-            className="w-full h-96 object-cover rounded-t-xl"
-          />
+          {imageError ? (
+            <div className="w-full h-96 bg-slate-700 flex items-center justify-center rounded-t-xl">
+              <div className="text-center text-slate-400">
+                <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p className="text-lg">Image not available</p>
+              </div>
+            </div>
+          ) : (
+            <img
+              src={option.imageUrls[0]}
+              alt={option.nickname}
+              className="w-full h-96 object-cover rounded-t-xl"
+              onError={() => setImageError(true)}
+            />
+          )}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors"
@@ -89,14 +107,26 @@ export default function CottageModal({ option, onClose }: CottageModalProps) {
             </div>
           )}
 
-          <a
-            href={option.airbnbUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full bg-primary-600 hover:bg-primary-700 text-white text-center py-4 rounded-lg font-semibold transition-colors shadow-lg"
-          >
-            View on Airbnb →
-          </a>
+          {!isTBD ? (
+            <a
+              href={option.airbnbUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full bg-gradient-to-r from-[#FF385C] to-[#E61E4D] hover:from-[#E61E4D] hover:to-[#C13447] text-white text-center py-5 px-6 rounded-lg font-bold text-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-3"
+            >
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span>View Full Listing on Airbnb</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          ) : (
+            <div className="block w-full bg-slate-700 text-slate-400 text-center py-5 px-6 rounded-lg font-semibold italic">
+              Airbnb listing details coming soon
+            </div>
+          )}
         </div>
       </div>
     </div>

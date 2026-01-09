@@ -50,15 +50,16 @@ CREATE INDEX IF NOT EXISTS idx_rankings_voter_name ON rankings("voterName");
 CREATE INDEX IF NOT EXISTS idx_rankings_first_option ON rankings("firstOptionId");
 CREATE INDEX IF NOT EXISTS idx_rankings_second_option ON rankings("secondOptionId");
 
--- Insert sample data (6 cottage options with placeholder data)
--- You can update these via the admin panel later
+-- Insert sample data (6 cottage options)
+-- Updated with actual Airbnb listings for June 26-29, 2026
+-- NOTE: Options A and B currently share the same Airbnb URL - B is marked as TBD until correct link is provided
 INSERT INTO options (code, nickname, title, location, "priceNight", "totalEstimate", guests, beds, baths, perks, "airbnbUrl", "imageUrls", notes) VALUES
-('A', 'Lakeview', 'Lakeview Cottage with Private Beach', 'Muskoka, ON', 450, 1800, 8, 4, 2.0, ARRAY['Private beach', 'Kayaks included', 'Fire pit', 'BBQ'], 'https://airbnb.com', ARRAY['/options/A.jpg'], 'Beautiful lakefront property with stunning sunset views'),
-('B', 'Sauna Cabin', 'Modern Cabin with Finnish Sauna', 'Haliburton, ON', 380, 1520, 6, 3, 2.0, ARRAY['Finnish sauna', 'Hot tub', 'Forest trails', 'Game room'], 'https://airbnb.com', ARRAY['/options/B.jpg'], 'Perfect for relaxation with premium sauna experience'),
-('C', 'Forest Lodge', 'Rustic Forest Lodge', 'Algonquin, ON', 420, 1680, 10, 5, 3.0, ARRAY['Near hiking trails', 'Large deck', 'Fireplace', 'Sleeps 10'], 'https://airbnb.com', ARRAY['/options/C.jpg'], 'Spacious lodge ideal for large groups'),
-('D', 'River House', 'Riverside Retreat', 'Kawartha Lakes, ON', 400, 1600, 8, 4, 2.5, ARRAY['River access', 'Canoe included', 'Fishing dock', 'Screened porch'], 'https://airbnb.com', ARRAY['/options/D.jpg'], 'Great for water activities and fishing enthusiasts'),
-('E', 'Ski Chalet', 'Luxury Ski Chalet', 'Blue Mountain, ON', 550, 2200, 8, 4, 3.0, ARRAY['Ski in/out', 'Heated floors', 'Wine cellar', 'Mountain views'], 'https://airbnb.com', ARRAY['/options/E.jpg'], 'Premium winter getaway with ski access'),
-('F', 'Island Cottage', 'Private Island Cottage', 'Georgian Bay, ON', 500, 2000, 6, 3, 1.5, ARRAY['Private island', 'Boat included', 'Solar powered', 'Secluded'], 'https://airbnb.com', ARRAY['/options/F.jpg'], 'Ultimate privacy on your own island')
+('A', 'Maple Gateway', 'The Maple Gateway', 'Ontario, Canada', 450, 1800, 7, 4, 2.0, ARRAY['Sleeps 7', 'Lakefront', 'Private beach', 'Fire pit'], 'https://www.airbnb.ca/rooms/50855351?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P30G3hzmZG8xA0pQ&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/A.jpg'], 'Beautiful gateway cottage'),
+('B', 'Family Retreat', 'Lakefront Family Retreat', 'Ontario, Canada - TBD', 0, 0, 7, 4, 2.0, ARRAY['Details pending'], 'https://airbnb.com/tbd', ARRAY['/options/B.jpg'], 'WARNING: This listing shares the same URL as Option A. Awaiting correct Airbnb link.'),
+('C', 'Pines & Paddles', 'Pines and Paddles Family Cottage', 'Ontario, Canada', 420, 1680, 7, 4, 2.0, ARRAY['Sleeps 7', 'Waterfront', 'Kayaks', 'Family-friendly'], 'https://www.airbnb.ca/rooms/1047994884766848427?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3P8WKivwuvKMWse&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/C.jpg'], 'Perfect for family adventures'),
+('D', 'Paradise Lake', 'Paradise Lake House, all seasons.', 'Ontario, Canada', 400, 1600, 7, 4, 2.0, ARRAY['Sleeps 7', 'All-season', 'Lake access', 'Year-round'], 'https://www.airbnb.ca/rooms/39502464?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3vpS2cFSOgLqSMw&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/D.jpg'], 'Beautiful all-season lake house'),
+('E', 'Eagle Point', 'Eagle Point, Eagle Lake', 'Ontario, Canada', 480, 1920, 7, 4, 2.0, ARRAY['Sleeps 7', 'Eagle Lake', 'Scenic views', 'Waterfront'], 'https://www.airbnb.ca/rooms/1426867684446395623?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3fG2MkJ1fv8rexl&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/E.jpg'], 'Stunning Eagle Lake property'),
+('F', 'TBD', 'TBD - Additional Option', 'To Be Determined', 0, 0, 0, 0, 0.0, ARRAY['Coming soon'], 'https://airbnb.com/placeholder', ARRAY['/options/F.jpg'], 'Placeholder for future cottage option')
 ON CONFLICT (code) DO NOTHING;
 
 -- Enable Row Level Security (RLS)
