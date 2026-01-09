@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
-import { getOptions, getVotes, getRankings } from '../lib/supabase'
-import type { CottageOption, Vote, Ranking, VoteSummary, RankingSummary } from '../types'
+import { getOptions, getVotes } from '../lib/supabase'
+import type { CottageOption, Vote, VoteSummary } from '../types'
 
 export default function Results() {
   const [options, setOptions] = useState<CottageOption[]>([])
   const [voteSummaries, setVoteSummaries] = useState<VoteSummary[]>([])
-  const [rankingSummaries, setRankingSummaries] = useState<RankingSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedOption, setExpandedOption] = useState<string | null>(null)
 
@@ -16,15 +15,13 @@ export default function Results() {
   const loadResults = async () => {
     try {
       setLoading(true)
-      const [optionsData, votesData, rankingsData] = await Promise.all([
+      const [optionsData, votesData] = await Promise.all([
         getOptions(),
         getVotes(),
-        getRankings(),
       ])
 
       setOptions(optionsData)
       setVoteSummaries(computeVoteSummaries(optionsData, votesData))
-      setRankingSummaries(computeRankingSummaries(optionsData, rankingsData))
     } catch (err) {
       console.error('Error loading results:', err)
     } finally {
@@ -51,27 +48,6 @@ export default function Results() {
     })
   }
 
-  const computeRankingSummaries = (
-    options: CottageOption[],
-    rankings: Ranking[]
-  ): RankingSummary[] => {
-    const summaries = options.map((option) => {
-      const firstPlaceVotes = rankings.filter((r) => r.firstOptionId === option.id).length
-      const secondPlaceVotes = rankings.filter((r) => r.secondOptionId === option.id).length
-      const points = firstPlaceVotes * 2 + secondPlaceVotes * 1
-
-      return {
-        optionId: option.id,
-        points,
-        firstPlaceVotes,
-        secondPlaceVotes,
-      }
-    })
-
-    // Sort by points descending
-    return summaries.sort((a, b) => b.points - a.points)
-  }
-
   const getOption = (id: string) => options.find((o) => o.id === id)
 
   const toggleExpanded = (optionId: string) => {
@@ -92,61 +68,6 @@ export default function Results() {
   return (
     <div>
       <h1 className="text-4xl font-bold text-white mb-8">Voting Results</h1>
-
-      {/* Top 2 Leaderboard */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-white mb-4">🏆 Top 2 Leaderboard</h2>
-        <p className="text-slate-400 mb-6">
-          Ranked by points: First choice = 2 points, Second choice = 1 point
-        </p>
-
-        <div className="space-y-3">
-          {rankingSummaries.map((summary, index) => {
-            const option = getOption(summary.optionId)
-            if (!option) return null
-
-            const isTop = index < 3
-            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''
-
-            return (
-              <div
-                key={option.id}
-                className={`bg-slate-800 border rounded-xl p-6 transition-all ${
-                  isTop
-                    ? 'border-primary-500 shadow-lg shadow-primary-500/20'
-                    : 'border-slate-700'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="text-3xl">{medal || `#${index + 1}`}</div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="bg-primary-600 text-white px-3 py-1 rounded-lg font-bold">
-                          {option.code}
-                        </span>
-                        <span className="text-xl font-bold text-white">
-                          {option.nickname}
-                        </span>
-                      </div>
-                      <div className="text-slate-400 text-sm mt-1">
-                        {summary.firstPlaceVotes} × 1st place, {summary.secondPlaceVotes} × 2nd
-                        place
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-primary-400">
-                      {summary.points}
-                    </div>
-                    <div className="text-slate-400 text-sm">points</div>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
 
       {/* Vote Tallies */}
       <div>

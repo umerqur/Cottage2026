@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { CottageOption, Vote, Ranking } from '../types'
+import type { CottageOption, Vote } from '../types'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
@@ -19,11 +19,6 @@ export interface Database {
         Row: Vote
         Insert: Omit<Vote, 'id' | 'createdAt'>
         Update: Partial<Omit<Vote, 'id' | 'createdAt'>>
-      }
-      rankings: {
-        Row: Ranking
-        Insert: Omit<Ranking, 'id' | 'createdAt'>
-        Update: Partial<Omit<Ranking, 'id' | 'createdAt'>>
       }
     }
   }
@@ -128,68 +123,6 @@ export async function upsertVote(vote: Database['public']['Tables']['votes']['In
 export async function deleteAllVotes() {
   const { error } = await supabase
     .from('votes')
-    .delete()
-    .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
-
-  if (error) throw error
-}
-
-// Rankings API
-export async function getRankings() {
-  const { data, error } = await supabase
-    .from('rankings')
-    .select('*')
-    .order('createdAt', { ascending: false })
-
-  if (error) throw error
-  return data as Ranking[]
-}
-
-export async function getUserRanking(voterName: string) {
-  const { data, error } = await supabase
-    .from('rankings')
-    .select('*')
-    .eq('voterName', voterName)
-    .maybeSingle()
-
-  if (error) throw error
-  return data as Ranking | null
-}
-
-export async function upsertRanking(ranking: Database['public']['Tables']['rankings']['Insert']) {
-  // Check if ranking exists
-  const existing = await getUserRanking(ranking.voterName)
-
-  if (existing) {
-    // Update existing ranking
-    const { data, error } = await supabase
-      .from('rankings')
-      .update({
-        firstOptionId: ranking.firstOptionId,
-        secondOptionId: ranking.secondOptionId,
-      })
-      .eq('id', existing.id)
-      .select()
-      .single()
-
-    if (error) throw error
-    return data as Ranking
-  } else {
-    // Create new ranking
-    const { data, error } = await supabase
-      .from('rankings')
-      .insert(ranking)
-      .select()
-      .single()
-
-    if (error) throw error
-    return data as Ranking
-  }
-}
-
-export async function deleteAllRankings() {
-  const { error } = await supabase
-    .from('rankings')
     .delete()
     .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
 
