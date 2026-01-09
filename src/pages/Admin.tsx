@@ -3,7 +3,6 @@ import {
   getOptions,
   updateOption,
   deleteAllVotes,
-  deleteAllRankings,
 } from '../lib/supabase'
 import type { CottageOption } from '../types'
 
@@ -45,13 +44,13 @@ export default function Admin() {
   }
 
   const handleResetVotes = async () => {
-    if (!confirm('Are you sure you want to reset ALL votes and rankings? This cannot be undone.')) {
+    if (!confirm('Are you sure you want to reset ALL votes? This cannot be undone.')) {
       return
     }
 
     try {
-      await Promise.all([deleteAllVotes(), deleteAllRankings()])
-      alert('All votes and rankings have been reset!')
+      await deleteAllVotes()
+      alert('All votes have been reset!')
     } catch (err) {
       console.error('Error resetting votes:', err)
       alert('Failed to reset votes. Check console for details.')
@@ -329,7 +328,7 @@ export default function Admin() {
           onClick={handleResetVotes}
           className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-lg"
         >
-          Reset All Votes & Rankings
+          Reset All Votes
         </button>
       </div>
 

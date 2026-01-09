@@ -26,14 +26,6 @@ export interface Vote {
   createdAt: string
 }
 
-export interface Ranking {
-  id: string
-  voterName: string
-  firstOptionId: string
-  secondOptionId: string
-  createdAt: string
-}
-
 export interface VoteSummary {
   optionId: string
   yes: number
@@ -43,11 +35,4 @@ export interface VoteSummary {
     name: string
     vote: VoteValue
   }[]
-}
-
-export interface RankingSummary {
-  optionId: string
-  points: number
-  firstPlaceVotes: number
-  secondPlaceVotes: number
 }

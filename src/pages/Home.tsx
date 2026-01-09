@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import CottageCard from '../components/CottageCard'
 import CottageModal from '../components/CottageModal'
-import RankingPicker from '../components/RankingPicker'
-import { getOptions, getUserVote, upsertVote, getUserRanking, upsertRanking } from '../lib/supabase'
+import { getOptions, getUserVote, upsertVote } from '../lib/supabase'
 import type { CottageOption, VoteValue } from '../types'
 
 export default function Home() {
@@ -13,7 +12,6 @@ export default function Home() {
   const [namePrompt, setNamePrompt] = useState(true)
   const [userVotes, setUserVotes] = useState<Record<string, VoteValue>>({})
   const [selectedOption, setSelectedOption] = useState<CottageOption | null>(null)
-  const [currentRanking, setCurrentRanking] = useState<{ first?: string; second?: string }>({})
 
   useEffect(() => {
     // Check localStorage for saved name
@@ -30,10 +28,7 @@ export default function Home() {
   const loadData = async (name: string) => {
     try {
       setLoading(true)
-      const [optionsData, rankingData] = await Promise.all([
-        getOptions(),
-        getUserRanking(name),
-      ])
+      const optionsData = await getOptions()
 
       setOptions(optionsData)
 
@@ -46,14 +41,6 @@ export default function Home() {
         }
       }
       setUserVotes(votes)
-
-      // Load user's ranking
-      if (rankingData) {
-        setCurrentRanking({
-          first: rankingData.firstOptionId,
-          second: rankingData.secondOptionId,
-        })
-      }
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Failed to load cottage options. Please check your connection.')
@@ -90,21 +77,6 @@ export default function Home() {
       console.error('Error saving vote:', err)
       alert('Failed to save your vote. Please try again.')
     }
-  }
-
-  const handleSaveRanking = async (firstId: string, secondId: string) => {
-    if (!voterName) return
-
-    await upsertRanking({
-      voterName,
-      firstOptionId: firstId,
-      secondOptionId: secondId,
-    })
-
-    setCurrentRanking({
-      first: firstId,
-      second: secondId,
-    })
   }
 
   if (namePrompt) {
@@ -182,15 +154,6 @@ export default function Home() {
             </button>
           </p>
         </div>
-      </div>
-
-      <div className="mb-8">
-        <RankingPicker
-          options={options}
-          currentFirstId={currentRanking.first}
-          currentSecondId={currentRanking.second}
-          onSave={handleSaveRanking}
-        />
       </div>
 
       <div className="mb-6">
