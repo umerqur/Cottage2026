@@ -60,9 +60,10 @@ export async function getDefaultRoom() {
 }
 
 export async function createRoom(room: Database['public']['Tables']['rooms']['Insert']) {
+  const { name, joinCode } = room
   const { data, error } = await supabase
     .from('rooms')
-    .insert(room)
+    .insert({ name, joinCode })
     .select()
     .single()
 
