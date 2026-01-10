@@ -4,6 +4,7 @@ export interface Room {
   id: string
   joinCode: string
   name: string
+  adminName?: string
   createdAt: string
 }
 

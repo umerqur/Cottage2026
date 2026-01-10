@@ -60,11 +60,11 @@ export async function getDefaultRoom() {
 }
 
 export async function createRoom(room: Database['public']['Tables']['rooms']['Insert']) {
-  const { name, joinCode } = room
+  const { name, joinCode, adminName } = room
 
   const { data, error } = await supabase
     .from('rooms')
-    .insert({ name, join_code: joinCode })
+    .insert({ name, join_code: joinCode, admin_name: adminName })
     .select()
     .single()
 
@@ -190,4 +190,26 @@ export async function deleteAllVotes(roomId: string) {
     .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all in room
 
   if (error) throw error
+}
+
+// Storage API
+export async function uploadOptionImage(file: File, roomId: string): Promise<string> {
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${roomId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
+  const filePath = `option-images/${fileName}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('cottage-images')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+    })
+
+  if (uploadError) throw uploadError
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('cottage-images')
+    .getPublicUrl(filePath)
+
+  return publicUrl
 }
