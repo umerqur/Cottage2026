@@ -33,6 +33,17 @@ export interface Database {
 export const DEFAULT_ROOM_ID = '00000000-0000-0000-0000-000000000001'
 export const DEFAULT_JOIN_CODE = 'cottage2026'
 
+// Generate a random join code (6-8 chars, uppercase, no confusing chars like O, 0, I, 1, etc.)
+export function generateJoinCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // No O, 0, I, 1
+  const length = Math.floor(Math.random() * 3) + 6 // 6-8 chars
+  let code = ''
+  for (let i = 0; i < length; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return code
+}
+
 export async function getRoomByJoinCode(joinCode: string) {
   const { data, error } = await supabase
     .from('rooms')

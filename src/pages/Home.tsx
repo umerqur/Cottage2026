@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { User } from 'lucide-react'
+import { User, Share2 } from 'lucide-react'
 import CottageCard from '../components/CottageCard'
 import CottageModal from '../components/CottageModal'
 import { getOptions, getUserVote, upsertVote, getVotes } from '../lib/supabase'
@@ -20,8 +20,8 @@ export default function Home({ roomId }: HomeProps) {
   const [voteCounts, setVoteCounts] = useState<Record<string, { yes: number; maybe: number; no: number }>>({})
 
   useEffect(() => {
-    // Check localStorage for saved name
-    const savedName = localStorage.getItem('cottageVoterName')
+    // Check localStorage for saved name (room-scoped)
+    const savedName = localStorage.getItem(`cottageVoterName:${roomId}`)
     if (savedName) {
       setVoterName(savedName)
       setNamePrompt(false)
@@ -75,7 +75,7 @@ export default function Home({ roomId }: HomeProps) {
 
     const trimmedName = name.trim()
     setVoterName(trimmedName)
-    localStorage.setItem('cottageVoterName', trimmedName)
+    localStorage.setItem(`cottageVoterName:${roomId}`, trimmedName)
     setNamePrompt(false)
     loadData(trimmedName)
   }
@@ -112,6 +112,15 @@ export default function Home({ roomId }: HomeProps) {
       console.error('Error saving vote:', err)
       alert('Failed to save your vote. Please try again.')
     }
+  }
+
+  const handleShareLink = () => {
+    const url = window.location.href.split('/results')[0].split('/admin')[0]
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Room link copied to clipboard!')
+    }).catch(() => {
+      alert('Failed to copy link. Please copy manually: ' + url)
+    })
   }
 
   if (namePrompt) {
@@ -176,21 +185,30 @@ export default function Home({ roomId }: HomeProps) {
       <div className="mb-8 -mt-6 -mx-6 px-6 py-5 bg-white border-b border-cottage-sand shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold text-cottage-charcoal tracking-tight">Cottage 2026</h1>
-          <div className="flex items-center gap-3 bg-cottage-sand/30 px-4 py-2 rounded-lg border border-cottage-sand">
-            <User className="w-4 h-4 text-cottage-gray" />
-            <span className="text-sm text-cottage-gray">
-              Voting as <span className="font-semibold text-cottage-charcoal">{voterName}</span>
-            </span>
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => {
-                localStorage.removeItem('cottageVoterName')
-                setNamePrompt(true)
-                setVoterName('')
-              }}
-              className="ml-2 text-xs px-3 py-1 bg-cottage-green hover:bg-cottage-green/90 text-white rounded transition-colors font-medium"
+              onClick={handleShareLink}
+              className="flex items-center gap-2 px-4 py-2 bg-cottage-green hover:bg-cottage-green/90 text-white rounded-lg transition-colors shadow-md font-medium"
             >
-              Change
+              <Share2 className="w-4 h-4" />
+              Share Link
             </button>
+            <div className="flex items-center gap-3 bg-cottage-sand/30 px-4 py-2 rounded-lg border border-cottage-sand">
+              <User className="w-4 h-4 text-cottage-gray" />
+              <span className="text-sm text-cottage-gray">
+                Voting as <span className="font-semibold text-cottage-charcoal">{voterName}</span>
+              </span>
+              <button
+                onClick={() => {
+                  localStorage.removeItem(`cottageVoterName:${roomId}`)
+                  setNamePrompt(true)
+                  setVoterName('')
+                }}
+                className="ml-2 text-xs px-3 py-1 bg-cottage-green hover:bg-cottage-green/90 text-white rounded transition-colors font-medium"
+              >
+                Change
+              </button>
+            </div>
           </div>
         </div>
       </div>
