@@ -6,11 +6,18 @@ interface CottageCardProps {
   userVote?: VoteValue
   onVote: (optionId: string, vote: VoteValue) => void
   onViewDetails: (option: CottageOption) => void
+  voteCounts?: {
+    yes: number
+    maybe: number
+    no: number
+  }
 }
 
-export default function CottageCard({ option, userVote, onVote, onViewDetails }: CottageCardProps) {
+export default function CottageCard({ option, userVote, onVote, onViewDetails, voteCounts }: CottageCardProps) {
   const [isVoting, setIsVoting] = useState(false)
   const [imageError, setImageError] = useState(false)
+
+  const totalVotes = voteCounts ? voteCounts.yes + voteCounts.maybe + voteCounts.no : 0
 
   // Check if this is a TBD placeholder cottage
   const isTBD = option.nickname === 'TBD' || option.title.includes('TBD')
@@ -125,6 +132,32 @@ export default function CottageCard({ option, userVote, onVote, onViewDetails }:
             </span>
           )}
         </div>
+
+        {/* Vote Count Badge and Pills */}
+        {voteCounts && totalVotes > 0 && (
+          <div className="bg-slate-700/30 rounded-lg p-3 mb-4 border border-slate-600/50">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-slate-400 text-xs font-medium">Votes</span>
+              <span className="bg-primary-600 text-white px-2 py-1 rounded text-xs font-bold">
+                {totalVotes}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1 flex items-center gap-1.5 bg-slate-700/50 rounded px-2 py-1.5">
+                <span className="text-sm">👍</span>
+                <span className="text-white text-sm font-medium">{voteCounts.yes}</span>
+              </div>
+              <div className="flex-1 flex items-center gap-1.5 bg-slate-700/50 rounded px-2 py-1.5">
+                <span className="text-sm">🤔</span>
+                <span className="text-white text-sm font-medium">{voteCounts.maybe}</span>
+              </div>
+              <div className="flex-1 flex items-center gap-1.5 bg-slate-700/50 rounded px-2 py-1.5">
+                <span className="text-sm">👎</span>
+                <span className="text-white text-sm font-medium">{voteCounts.no}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {!isTBD && (
           <div className="border-t border-slate-700 pt-4">
