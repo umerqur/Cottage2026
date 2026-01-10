@@ -61,13 +61,30 @@ export async function getDefaultRoom() {
 
 export async function createRoom(room: Database['public']['Tables']['rooms']['Insert']) {
   const { name, joinCode } = room
+
+  // Log the insert payload for debugging
+  const payload = { name, joinCode }
+  console.log('Creating room with payload:', payload)
+
   const { data, error } = await supabase
     .from('rooms')
-    .insert({ name, joinCode })
+    .insert(payload)
     .select()
     .single()
 
-  if (error) throw error
+  if (error) {
+    // Log the full error details
+    console.error('Supabase error creating room:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+      payload,
+    })
+    throw error
+  }
+
+  console.log('Room created successfully:', data)
   return data as Room
 }
 
