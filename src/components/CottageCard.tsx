@@ -17,8 +17,6 @@ export default function CottageCard({ option, userVote, onVote, onViewDetails, v
   const [isVoting, setIsVoting] = useState(false)
   const [imageError, setImageError] = useState(false)
 
-  const totalVotes = voteCounts ? voteCounts.yes + voteCounts.maybe + voteCounts.no : 0
-
   // Check if this is a TBD placeholder cottage
   const isTBD = option.nickname === 'TBD' || option.title.includes('TBD')
 
@@ -133,23 +131,11 @@ export default function CottageCard({ option, userVote, onVote, onViewDetails, v
           )}
         </div>
 
-        {/* Vote Count Badge */}
+        {/* Vote Score Badge */}
         {voteCounts && (
           <div className="mb-4">
-            <div className="flex items-center gap-2">
-              <div className="bg-primary-600 text-white px-2.5 py-2.5 rounded text-sm font-bold leading-none min-w-[2.5rem] text-center">
-                {totalVotes}
-              </div>
-              <div className="flex gap-2 text-xs">
-                <div className="flex items-center gap-1">
-                  <span>👍</span>
-                  <span className="text-slate-300 font-medium">{voteCounts.yes}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span>👎</span>
-                  <span className="text-slate-300 font-medium">{voteCounts.no}</span>
-                </div>
-              </div>
+            <div className="bg-primary-600 text-white px-3 py-3 rounded text-lg font-bold leading-none w-14 text-center">
+              {voteCounts.yes - voteCounts.no}
             </div>
           </div>
         )}
