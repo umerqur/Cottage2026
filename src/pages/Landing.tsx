@@ -32,7 +32,7 @@ export default function Landing() {
       navigate(`/r/${joinCode}`)
     } catch (err) {
       console.error('Error creating room:', err)
-      setError('Failed to create room. Please try again.')
+      setError(err instanceof Error ? err.message : 'Failed to create room. Please try again.')
     } finally {
       setLoading(false)
     }
