@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react'
 import { getOptions, getVotes } from '../lib/supabase'
-import type { CottageOption, Vote, VoteSummary } from '../types'
+import type { CottageOption } from '../types'
+
+interface VoteSummary {
+  option: CottageOption
+  yes: number
+  maybe: number
+  no: number
+  total: number
+}
 
 export default function Results() {
-  const [options, setOptions] = useState<CottageOption[]>([])
   const [voteSummaries, setVoteSummaries] = useState<VoteSummary[]>([])
   const [loading, setLoading] = useState(true)
-  const [expandedOption, setExpandedOption] = useState<string | null>(null)
 
   useEffect(() => {
     loadResults()
@@ -20,38 +26,27 @@ export default function Results() {
         getVotes(),
       ])
 
-      setOptions(optionsData)
-      setVoteSummaries(computeVoteSummaries(optionsData, votesData))
+      const summaries: VoteSummary[] = optionsData.map((option) => {
+        const optionVotes = votesData.filter((v) => v.optionId === option.id)
+        const yes = optionVotes.filter((v) => v.voteValue === 'yes').length
+        const maybe = optionVotes.filter((v) => v.voteValue === 'maybe').length
+        const no = optionVotes.filter((v) => v.voteValue === 'no').length
+
+        return {
+          option,
+          yes,
+          maybe,
+          no,
+          total: yes + maybe + no,
+        }
+      })
+
+      setVoteSummaries(summaries)
     } catch (err) {
       console.error('Error loading results:', err)
     } finally {
       setLoading(false)
     }
-  }
-
-  const computeVoteSummaries = (
-    options: CottageOption[],
-    votes: Vote[]
-  ): VoteSummary[] => {
-    return options.map((option) => {
-      const optionVotes = votes.filter((v) => v.optionId === option.id)
-      return {
-        optionId: option.id,
-        yes: optionVotes.filter((v) => v.voteValue === 'yes').length,
-        maybe: optionVotes.filter((v) => v.voteValue === 'maybe').length,
-        no: optionVotes.filter((v) => v.voteValue === 'no').length,
-        voters: optionVotes.map((v) => ({
-          name: v.voterName,
-          vote: v.voteValue,
-        })),
-      }
-    })
-  }
-
-  const getOption = (id: string) => options.find((o) => o.id === id)
-
-  const toggleExpanded = (optionId: string) => {
-    setExpandedOption(expandedOption === optionId ? null : optionId)
   }
 
   if (loading) {
@@ -67,103 +62,134 @@ export default function Results() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-white mb-8">Voting Results</h1>
+      <h1 className="text-4xl font-bold text-white mb-3">📊 Voting Results</h1>
+      <p className="text-slate-400 mb-8">Real-time vote breakdown for all cottage options</p>
 
-      {/* Vote Tallies */}
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-4">📊 Vote Breakdown</h2>
-        <p className="text-slate-400 mb-6">
-          See how everyone voted on each option. Click to expand voter details.
-        </p>
+      <div className="space-y-6">
+        {voteSummaries.map((summary) => {
+          const { option, yes, maybe, no, total } = summary
 
-        <div className="space-y-4">
-          {voteSummaries.map((summary) => {
-            const option = getOption(summary.optionId)
-            if (!option) return null
+          // Calculate percentages for bar segments
+          const yesPercent = total > 0 ? (yes / total) * 100 : 0
+          const maybePercent = total > 0 ? (maybe / total) * 100 : 0
+          const noPercent = total > 0 ? (no / total) * 100 : 0
 
-            const total = summary.yes + summary.maybe + summary.no
-            const isExpanded = expandedOption === option.id
-
-            return (
-              <div
-                key={option.id}
-                className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden"
-              >
-                <button
-                  onClick={() => toggleExpanded(option.id)}
-                  className="w-full p-6 text-left hover:bg-slate-750 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="bg-primary-600 text-white px-3 py-1 rounded-lg font-bold text-lg">
-                        {option.code}
-                      </span>
-                      <span className="text-xl font-bold text-white">
-                        {option.nickname}
-                      </span>
-                    </div>
-                    <div className="text-slate-400">
-                      {total} {total === 1 ? 'vote' : 'votes'}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-4">
-                      <div className="text-green-400 text-sm mb-1">Yes</div>
-                      <div className="text-2xl font-bold text-white">{summary.yes}</div>
-                    </div>
-                    <div className="bg-yellow-900/20 border border-yellow-700/30 rounded-lg p-4">
-                      <div className="text-yellow-400 text-sm mb-1">Maybe</div>
-                      <div className="text-2xl font-bold text-white">{summary.maybe}</div>
-                    </div>
-                    <div className="bg-red-900/20 border border-red-700/30 rounded-lg p-4">
-                      <div className="text-red-400 text-sm mb-1">No</div>
-                      <div className="text-2xl font-bold text-white">{summary.no}</div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 text-center text-sm text-slate-400">
-                    {isExpanded ? '▲ Click to hide voters' : '▼ Click to show who voted'}
-                  </div>
-                </button>
-
-                {isExpanded && summary.voters.length > 0 && (
-                  <div className="border-t border-slate-700 p-6">
-                    <h4 className="text-white font-semibold mb-3">Voter Breakdown</h4>
-                    <div className="space-y-2">
-                      {summary.voters.map((voter, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between bg-slate-700/50 rounded-lg px-4 py-2"
-                        >
-                          <span className="text-slate-300">{voter.name}</span>
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              voter.vote === 'yes'
-                                ? 'bg-green-900/40 text-green-400'
-                                : voter.vote === 'maybe'
-                                ? 'bg-yellow-900/40 text-yellow-400'
-                                : 'bg-red-900/40 text-red-400'
-                            }`}
-                          >
-                            {voter.vote === 'yes' ? 'Yes' : voter.vote === 'maybe' ? 'Maybe' : 'No'}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {isExpanded && summary.voters.length === 0 && (
-                  <div className="border-t border-slate-700 p-6 text-center text-slate-400">
-                    No votes yet for this option
-                  </div>
-                )}
+          return (
+            <div
+              key={option.id}
+              className="bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors"
+            >
+              {/* Label */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="bg-primary-600 text-white px-3 py-1.5 rounded-lg font-bold text-lg">
+                    {option.code}
+                  </span>
+                  <span className="text-xl font-bold text-white">
+                    {option.nickname}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-400 text-sm">Total:</span>
+                  <span className="bg-slate-700 text-white px-3 py-1 rounded-lg font-bold">
+                    {total}
+                  </span>
+                </div>
               </div>
-            )
-          })}
-        </div>
+
+              {/* Horizontal Bar Chart */}
+              {total > 0 ? (
+                <div className="space-y-3">
+                  <div className="flex h-12 rounded-lg overflow-hidden bg-slate-700/30">
+                    {/* Yes segment */}
+                    {yes > 0 && (
+                      <div
+                        className="bg-green-600 flex items-center justify-center text-white font-semibold transition-all hover:bg-green-500"
+                        style={{ width: `${yesPercent}%` }}
+                      >
+                        {yesPercent >= 15 && (
+                          <span className="text-sm flex items-center gap-1">
+                            <span>👍</span>
+                            <span>{yes}</span>
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Maybe segment */}
+                    {maybe > 0 && (
+                      <div
+                        className="bg-yellow-600 flex items-center justify-center text-white font-semibold transition-all hover:bg-yellow-500"
+                        style={{ width: `${maybePercent}%` }}
+                      >
+                        {maybePercent >= 15 && (
+                          <span className="text-sm flex items-center gap-1">
+                            <span>🤔</span>
+                            <span>{maybe}</span>
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* No segment */}
+                    {no > 0 && (
+                      <div
+                        className="bg-red-600 flex items-center justify-center text-white font-semibold transition-all hover:bg-red-500"
+                        style={{ width: `${noPercent}%` }}
+                      >
+                        {noPercent >= 15 && (
+                          <span className="text-sm flex items-center gap-1">
+                            <span>👎</span>
+                            <span>{no}</span>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Legend with counts */}
+                  <div className="flex gap-4 justify-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-green-600 rounded"></div>
+                      <span className="text-slate-300 text-sm">
+                        👍 Yes: <span className="font-semibold text-white">{yes}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-yellow-600 rounded"></div>
+                      <span className="text-slate-300 text-sm">
+                        🤔 Maybe: <span className="font-semibold text-white">{maybe}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-red-600 rounded"></div>
+                      <span className="text-slate-300 text-sm">
+                        👎 No: <span className="font-semibold text-white">{no}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-400 bg-slate-700/20 rounded-lg">
+                  No votes yet for this option
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
+
+      {voteSummaries.every(s => s.total === 0) && (
+        <div className="mt-8 text-center p-8 bg-slate-800 border border-slate-700 rounded-xl">
+          <div className="text-slate-400 text-lg">
+            No votes have been cast yet. Head to the{' '}
+            <a href="/" className="text-primary-400 hover:text-primary-300 font-semibold">
+              Home page
+            </a>
+            {' '}to start voting!
+          </div>
+        </div>
+      )}
     </div>
   )
 }

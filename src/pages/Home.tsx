@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import CottageCard from '../components/CottageCard'
 import CottageModal from '../components/CottageModal'
-import { getOptions, getUserVote, upsertVote } from '../lib/supabase'
+import { getOptions, getUserVote, upsertVote, getVotes } from '../lib/supabase'
 import type { CottageOption, VoteValue } from '../types'
 
 export default function Home() {
@@ -12,6 +12,7 @@ export default function Home() {
   const [namePrompt, setNamePrompt] = useState(true)
   const [userVotes, setUserVotes] = useState<Record<string, VoteValue>>({})
   const [selectedOption, setSelectedOption] = useState<CottageOption | null>(null)
+  const [voteCounts, setVoteCounts] = useState<Record<string, { yes: number; maybe: number; no: number }>>({})
 
   useEffect(() => {
     // Check localStorage for saved name
@@ -28,7 +29,10 @@ export default function Home() {
   const loadData = async (name: string) => {
     try {
       setLoading(true)
-      const optionsData = await getOptions()
+      const [optionsData, allVotes] = await Promise.all([
+        getOptions(),
+        getVotes()
+      ])
 
       setOptions(optionsData)
 
@@ -41,6 +45,18 @@ export default function Home() {
         }
       }
       setUserVotes(votes)
+
+      // Compute vote counts for all options
+      const counts: Record<string, { yes: number; maybe: number; no: number }> = {}
+      for (const option of optionsData) {
+        const optionVotes = allVotes.filter((v) => v.optionId === option.id)
+        counts[option.id] = {
+          yes: optionVotes.filter((v) => v.voteValue === 'yes').length,
+          maybe: optionVotes.filter((v) => v.voteValue === 'maybe').length,
+          no: optionVotes.filter((v) => v.voteValue === 'no').length,
+        }
+      }
+      setVoteCounts(counts)
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Failed to load cottage options. Please check your connection.')
@@ -73,6 +89,19 @@ export default function Home() {
         ...prev,
         [optionId]: vote,
       }))
+
+      // Refresh vote counts
+      const allVotes = await getVotes()
+      const counts: Record<string, { yes: number; maybe: number; no: number }> = {}
+      for (const option of options) {
+        const optionVotes = allVotes.filter((v) => v.optionId === option.id)
+        counts[option.id] = {
+          yes: optionVotes.filter((v) => v.voteValue === 'yes').length,
+          maybe: optionVotes.filter((v) => v.voteValue === 'maybe').length,
+          no: optionVotes.filter((v) => v.voteValue === 'no').length,
+        }
+      }
+      setVoteCounts(counts)
     } catch (err) {
       console.error('Error saving vote:', err)
       alert('Failed to save your vote. Please try again.')
@@ -171,6 +200,7 @@ export default function Home() {
             userVote={userVotes[option.id]}
             onVote={handleVote}
             onViewDetails={setSelectedOption}
+            voteCounts={voteCounts[option.id]}
           />
         ))}
       </div>
