@@ -5,7 +5,11 @@ import CottageModal from '../components/CottageModal'
 import { getOptions, getUserVote, upsertVote, getVotes } from '../lib/supabase'
 import type { CottageOption, VoteValue } from '../types'
 
-export default function Home() {
+interface HomeProps {
+  roomId: string
+}
+
+export default function Home({ roomId }: HomeProps) {
   const [options, setOptions] = useState<CottageOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,14 +29,14 @@ export default function Home() {
     } else {
       setLoading(false)
     }
-  }, [])
+  }, [roomId])
 
   const loadData = async (name: string) => {
     try {
       setLoading(true)
       const [optionsData, allVotes] = await Promise.all([
-        getOptions(),
-        getVotes()
+        getOptions(roomId),
+        getVotes(roomId)
       ])
 
       setOptions(optionsData)
@@ -40,7 +44,7 @@ export default function Home() {
       // Load user's votes
       const votes: Record<string, VoteValue> = {}
       for (const option of optionsData) {
-        const vote = await getUserVote(name, option.id)
+        const vote = await getUserVote(roomId, name, option.id)
         if (vote) {
           votes[option.id] = vote.voteValue
         }
@@ -81,6 +85,7 @@ export default function Home() {
 
     try {
       await upsertVote({
+        roomId,
         voterName,
         optionId,
         voteValue: vote,
@@ -92,7 +97,7 @@ export default function Home() {
       }))
 
       // Refresh vote counts
-      const allVotes = await getVotes()
+      const allVotes = await getVotes(roomId)
       const counts: Record<string, { yes: number; maybe: number; no: number }> = {}
       for (const option of options) {
         const optionVotes = allVotes.filter((v) => v.optionId === option.id)
