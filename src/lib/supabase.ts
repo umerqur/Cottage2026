@@ -48,7 +48,7 @@ export async function getRoomByJoinCode(joinCode: string) {
   const { data, error } = await supabase
     .from('rooms')
     .select('*')
-    .eq('joinCode', joinCode)
+    .eq('join_code', joinCode)
     .single()
 
   if (error) throw error
@@ -62,13 +62,9 @@ export async function getDefaultRoom() {
 export async function createRoom(room: Database['public']['Tables']['rooms']['Insert']) {
   const { name, joinCode } = room
 
-  // Log the insert payload for debugging
-  const payload = { name, joinCode }
-  console.log('Creating room with payload:', payload)
-
   const { data, error } = await supabase
     .from('rooms')
-    .insert(payload)
+    .insert({ name, join_code: joinCode })
     .select()
     .single()
 
@@ -79,7 +75,6 @@ export async function createRoom(room: Database['public']['Tables']['rooms']['In
       details: error.details,
       hint: error.hint,
       code: error.code,
-      payload,
     })
     throw error
   }
