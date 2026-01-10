@@ -69,6 +69,15 @@ export async function updateOption(id: string, option: Database['public']['Table
   return data as CottageOption
 }
 
+export async function deleteOption(code: string) {
+  const { error } = await supabase
+    .from('options')
+    .delete()
+    .eq('code', code)
+
+  if (error) throw error
+}
+
 // Votes API
 export async function getVotes() {
   const { data, error } = await supabase

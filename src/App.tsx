@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import Home from './pages/Home'
 import Results from './pages/Results'
 import Admin from './pages/Admin'
+import DeleteOptions from './pages/DeleteOptions'
 
 function Navigation() {
   const location = useLocation()
@@ -61,6 +62,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/results" element={<Results />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/delete-options" element={<DeleteOptions />} />
           </Routes>
         </main>
       </div>
