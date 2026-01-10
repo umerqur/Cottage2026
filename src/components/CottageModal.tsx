@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { X, BedDouble, Bath, MapPin, Users, ExternalLink, ImageOff } from 'lucide-react'
 import type { CottageOption } from '../types'
 
 interface CottageModalProps {
@@ -16,83 +17,88 @@ export default function CottageModal({ option, onClose }: CottageModalProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="bg-slate-800 rounded-xl max-w-4xl w-full my-8 shadow-2xl border border-slate-700"
+        className="bg-slate-800 rounded-2xl max-w-4xl w-full my-8 shadow-2xl border border-slate-700/50"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
           {imageError ? (
-            <div className="w-full h-96 bg-slate-700 flex items-center justify-center rounded-t-xl">
-              <div className="text-center text-slate-400">
-                <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <p className="text-lg">Image not available</p>
-              </div>
+            <div className="w-full h-96 bg-slate-700/50 flex flex-col items-center justify-center rounded-t-2xl">
+              <ImageOff className="w-16 h-16 text-slate-500 mb-3" strokeWidth={1.5} />
+              <p className="text-lg text-slate-400 font-medium">Image not available</p>
             </div>
           ) : (
-            <img
-              src={option.imageUrls[0]}
-              alt={option.nickname}
-              className="w-full h-96 object-cover rounded-t-xl"
-              onError={() => setImageError(true)}
-            />
+            <>
+              <img
+                src={option.imageUrls[0]}
+                alt={option.nickname}
+                className="w-full h-96 object-cover rounded-t-2xl"
+                onError={() => setImageError(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/20 rounded-t-2xl" />
+            </>
           )}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+            className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm hover:bg-slate-900 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all border border-slate-700/50 hover:border-slate-600"
           >
-            ✕
+            <X className="w-5 h-5" strokeWidth={2} />
           </button>
-          <div className="absolute top-4 left-4 bg-primary-600 text-white px-4 py-2 rounded-lg font-bold text-2xl shadow-lg">
+          <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-sm text-white px-4 py-2 rounded-lg font-bold text-xl shadow-lg border border-slate-700/50">
             {option.code}
           </div>
         </div>
 
         <div className="p-8">
-          <h2 className="text-3xl font-bold text-white mb-2">{option.nickname}</h2>
-          <p className="text-xl text-slate-300 mb-6">{option.title}</p>
+          <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">{option.nickname}</h2>
+          <div className="flex items-center gap-2 text-slate-300 mb-6">
+            <MapPin className="w-4 h-4 text-slate-400" strokeWidth={2} />
+            <p className="text-lg">{option.title}</p>
+          </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <div className="text-slate-400 text-sm mb-1">Location</div>
+            <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-4">
+              <div className="text-slate-400 text-sm mb-1.5 font-medium">Location</div>
               <div className="text-white font-semibold">{option.location}</div>
             </div>
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <div className="text-slate-400 text-sm mb-1">Per Night</div>
+            <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-4">
+              <div className="text-slate-400 text-sm mb-1.5 font-medium">Per Night</div>
               <div className="text-white font-semibold">${option.priceNight}</div>
             </div>
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <div className="text-slate-400 text-sm mb-1">Total Est.</div>
+            <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-4">
+              <div className="text-slate-400 text-sm mb-1.5 font-medium">Total Est.</div>
               <div className="text-white font-semibold">${option.totalEstimate}</div>
             </div>
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <div className="text-slate-400 text-sm mb-1">Capacity</div>
-              <div className="text-white font-semibold">{option.guests} guests</div>
+            <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-4">
+              <div className="text-slate-400 text-sm mb-1.5 font-medium">Capacity</div>
+              <div className="text-white font-semibold flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-slate-400" strokeWidth={2} />
+                {option.guests}
+              </div>
             </div>
           </div>
 
           <div className="flex gap-6 mb-6 text-slate-300">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🛏️</span>
+              <BedDouble className="w-5 h-5 text-slate-400" strokeWidth={2} />
               <span className="font-medium">{option.beds} Bedrooms</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🚿</span>
+              <Bath className="w-5 h-5 text-slate-400" strokeWidth={2} />
               <span className="font-medium">{option.baths} Bathrooms</span>
             </div>
           </div>
 
           <div className="mb-6">
-            <h3 className="text-white font-semibold mb-3 text-lg">Perks & Amenities</h3>
+            <h3 className="text-white font-semibold mb-3 text-lg tracking-tight">Perks & Amenities</h3>
             <div className="flex flex-wrap gap-2">
               {option.perks.map((perk, index) => (
                 <span
                   key={index}
-                  className="bg-primary-900/30 text-primary-300 px-4 py-2 rounded-lg text-sm font-medium border border-primary-700/30"
+                  className="bg-slate-700/40 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium border border-slate-600/30"
                 >
                   {perk}
                 </span>
@@ -102,7 +108,7 @@ export default function CottageModal({ option, onClose }: CottageModalProps) {
 
           {option.notes && (
             <div className="mb-6">
-              <h3 className="text-white font-semibold mb-2 text-lg">Notes</h3>
+              <h3 className="text-white font-semibold mb-2 text-lg tracking-tight">Notes</h3>
               <p className="text-slate-300 leading-relaxed">{option.notes}</p>
             </div>
           )}
@@ -112,18 +118,13 @@ export default function CottageModal({ option, onClose }: CottageModalProps) {
               href={option.airbnbUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full bg-gradient-to-r from-[#FF385C] to-[#E61E4D] hover:from-[#E61E4D] hover:to-[#C13447] text-white text-center py-5 px-6 rounded-lg font-bold text-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-3"
+              className="flex items-center justify-center gap-3 w-full bg-gradient-to-r from-[#FF385C] to-[#E61E4D] hover:from-[#E61E4D] hover:to-[#C13447] text-white py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] group"
             >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
               <span>View Full Listing on Airbnb</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
+              <ExternalLink className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" strokeWidth={2} />
             </a>
           ) : (
-            <div className="block w-full bg-slate-700 text-slate-400 text-center py-5 px-6 rounded-lg font-semibold italic">
+            <div className="w-full bg-slate-700/50 border border-slate-600/30 text-slate-400 text-center py-4 px-6 rounded-xl font-semibold italic">
               Airbnb listing details coming soon
             </div>
           )}

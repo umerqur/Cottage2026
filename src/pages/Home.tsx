@@ -166,43 +166,51 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Choose Your Cottage</h1>
-          <p className="text-slate-300">
-            Voting as <span className="font-semibold text-primary-400">{voterName}</span>
+      {/* Premium Header Bar */}
+      <div className="mb-8 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1 tracking-tight">Cottage 2026</h1>
+            <p className="text-slate-400 text-sm">Select your perfect group getaway</p>
+          </div>
+          <div className="flex items-center gap-3 bg-slate-700/50 rounded-xl px-4 py-3 border border-slate-600/50">
+            <div className="text-sm">
+              <div className="text-slate-400 text-xs mb-0.5">Voting as</div>
+              <div className="text-white font-semibold">{voterName}</div>
+            </div>
             <button
               onClick={() => {
                 localStorage.removeItem('cottageVoterName')
                 setNamePrompt(true)
                 setVoterName('')
               }}
-              className="ml-3 text-sm text-slate-400 hover:text-white transition-colors"
+              className="text-xs bg-slate-600 hover:bg-slate-500 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
             >
-              (change)
+              Change
             </button>
-          </p>
+          </div>
         </div>
       </div>
 
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white mb-4">All Options</h2>
-        <p className="text-slate-400 mb-6">
-          Vote Yes, Maybe, or No for each cottage. Tap a card to view full details.
+        <p className="text-slate-400 text-sm">
+          Vote on each cottage and tap a card to view full details
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {options.map((option) => (
-          <CottageCard
-            key={option.id}
-            option={option}
-            userVote={userVotes[option.id]}
-            onVote={handleVote}
-            onViewDetails={setSelectedOption}
-            voteCounts={voteCounts[option.id]}
-          />
-        ))}
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {options.map((option) => (
+            <CottageCard
+              key={option.id}
+              option={option}
+              userVote={userVotes[option.id]}
+              onVote={handleVote}
+              onViewDetails={setSelectedOption}
+              voteCounts={voteCounts[option.id]}
+            />
+          ))}
+        </div>
       </div>
 
       <CottageModal option={selectedOption} onClose={() => setSelectedOption(null)} />
