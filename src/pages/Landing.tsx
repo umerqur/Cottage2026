@@ -34,7 +34,9 @@ export default function Landing() {
       navigate(`/r/${joinCode}`)
     } catch (err) {
       console.error('Error creating room:', err)
-      setError(err instanceof Error ? err.message : 'Failed to create room. Please try again.')
+      // Display the actual error message from Supabase
+      const errorMessage = (err as any)?.message || 'Failed to create room. Please try again.'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
