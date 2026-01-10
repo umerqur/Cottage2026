@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { User, Share2 } from 'lucide-react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { User, Share2, Plus } from 'lucide-react'
 import CottageCard from '../components/CottageCard'
 import CottageModal from '../components/CottageModal'
 import { getOptions, getUserVote, upsertVote, getVotes } from '../lib/supabase'
@@ -10,6 +11,8 @@ interface HomeProps {
 }
 
 export default function Home({ roomId }: HomeProps) {
+  const { joinCode } = useParams<{ joinCode: string }>()
+  const navigate = useNavigate()
   const [options, setOptions] = useState<CottageOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -34,6 +37,7 @@ export default function Home({ roomId }: HomeProps) {
   const loadData = async (name: string) => {
     try {
       setLoading(true)
+      setError(null)
       const [optionsData, allVotes] = await Promise.all([
         getOptions(roomId),
         getVotes(roomId)
@@ -64,6 +68,7 @@ export default function Home({ roomId }: HomeProps) {
       setVoteCounts(counts)
     } catch (err) {
       console.error('Error loading data:', err)
+      // Only set error if it's an actual error, not just empty results
       setError('Failed to load cottage options. Please check your connection.')
     } finally {
       setLoading(false)
@@ -215,35 +220,56 @@ export default function Home({ roomId }: HomeProps) {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-cottage-charcoal mb-2">All Options</h2>
-          <p className="text-cottage-gray text-sm">
-            Vote Yes, Maybe, or No for each cottage. Tap a card to view full details.
-          </p>
-        </div>
+        {options.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-cottage-sand rounded-full mb-6">
+              <Plus className="w-10 h-10 text-cottage-gray" />
+            </div>
+            <h2 className="text-2xl font-bold text-cottage-charcoal mb-3">No Listings Yet</h2>
+            <p className="text-cottage-gray mb-8 max-w-md mx-auto">
+              Get started by adding cottage options for your group to vote on.
+            </p>
+            <button
+              onClick={() => navigate(`/r/${joinCode}/admin`)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-cottage-green hover:bg-cottage-green/90 text-white font-semibold rounded-lg transition-colors shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
+              Add Listings
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-cottage-charcoal mb-2">All Options</h2>
+              <p className="text-cottage-gray text-sm">
+                Vote Yes, Maybe, or No for each cottage. Tap a card to view full details.
+              </p>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {options.map((option) => {
-            // Calculate highest score across all options
-            const allScores = options.map((opt) => {
-              const counts = voteCounts[opt.id]
-              return counts ? counts.yes - counts.no : 0
-            })
-            const highestScore = Math.max(...allScores)
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {options.map((option) => {
+                // Calculate highest score across all options
+                const allScores = options.map((opt) => {
+                  const counts = voteCounts[opt.id]
+                  return counts ? counts.yes - counts.no : 0
+                })
+                const highestScore = Math.max(...allScores)
 
-            return (
-              <CottageCard
-                key={option.id}
-                option={option}
-                userVote={userVotes[option.id]}
-                onVote={handleVote}
-                onViewDetails={setSelectedOption}
-                voteCounts={voteCounts[option.id]}
-                highestScore={highestScore}
-              />
-            )
-          })}
-        </div>
+                return (
+                  <CottageCard
+                    key={option.id}
+                    option={option}
+                    userVote={userVotes[option.id]}
+                    onVote={handleVote}
+                    onViewDetails={setSelectedOption}
+                    voteCounts={voteCounts[option.id]}
+                    highestScore={highestScore}
+                  />
+                )
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       <CottageModal option={selectedOption} onClose={() => setSelectedOption(null)} />

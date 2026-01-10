@@ -5,6 +5,7 @@ import { createRoom, generateJoinCode, getRoomByJoinCode } from '../lib/supabase
 
 export default function Landing() {
   const [roomName, setRoomName] = useState('')
+  const [adminName, setAdminName] = useState('')
   const [joinCode, setJoinCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -19,6 +20,11 @@ export default function Landing() {
       return
     }
 
+    if (!adminName.trim()) {
+      setError('Please enter your name')
+      return
+    }
+
     try {
       setLoading(true)
       setError(null)
@@ -28,7 +34,11 @@ export default function Landing() {
       await createRoom({
         name: roomName.trim(),
         joinCode,
+        adminName: adminName.trim(),
       })
+
+      // Store admin name in localStorage for this room
+      localStorage.setItem(`cottageVoterName:${joinCode}`, adminName.trim())
 
       // Redirect to the new room
       navigate(`/r/${joinCode}`)
@@ -121,7 +131,7 @@ export default function Landing() {
           )}
 
           <form onSubmit={handleCreateRoom}>
-            <div className="mb-6">
+            <div className="mb-4">
               <label htmlFor="roomName" className="block text-sm font-semibold text-cottage-charcoal mb-2">
                 Room Name
               </label>
@@ -132,6 +142,20 @@ export default function Landing() {
                 onChange={(e) => setRoomName(e.target.value)}
                 placeholder="e.g., Smith Family Cottage Trip"
                 autoFocus
+                className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-3 border border-cottage-sand focus:border-cottage-green focus:ring-2 focus:ring-cottage-green/20 outline-none transition-all"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="adminName" className="block text-sm font-semibold text-cottage-charcoal mb-2">
+                Your Name
+              </label>
+              <input
+                id="adminName"
+                type="text"
+                value={adminName}
+                onChange={(e) => setAdminName(e.target.value)}
+                placeholder="e.g., John Smith"
                 className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-3 border border-cottage-sand focus:border-cottage-green focus:ring-2 focus:ring-cottage-green/20 outline-none transition-all"
               />
             </div>
