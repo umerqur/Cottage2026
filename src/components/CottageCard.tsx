@@ -133,27 +133,22 @@ export default function CottageCard({ option, userVote, onVote, onViewDetails, v
           )}
         </div>
 
-        {/* Vote Count Badge and Pills */}
-        {voteCounts && totalVotes > 0 && (
-          <div className="bg-slate-700/30 rounded-lg p-3 mb-4 border border-slate-600/50">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-400 text-xs font-medium">Votes</span>
-              <span className="bg-primary-600 text-white px-2 py-1 rounded text-xs font-bold">
+        {/* Vote Count Badge */}
+        {voteCounts && (
+          <div className="mb-4">
+            <div className="flex items-center gap-2">
+              <div className="bg-primary-600 text-white px-2.5 py-2.5 rounded text-sm font-bold leading-none min-w-[2.5rem] text-center">
                 {totalVotes}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center gap-1.5 bg-slate-700/50 rounded px-2 py-1.5">
-                <span className="text-sm">👍</span>
-                <span className="text-white text-sm font-medium">{voteCounts.yes}</span>
               </div>
-              <div className="flex-1 flex items-center gap-1.5 bg-slate-700/50 rounded px-2 py-1.5">
-                <span className="text-sm">🤔</span>
-                <span className="text-white text-sm font-medium">{voteCounts.maybe}</span>
-              </div>
-              <div className="flex-1 flex items-center gap-1.5 bg-slate-700/50 rounded px-2 py-1.5">
-                <span className="text-sm">👎</span>
-                <span className="text-white text-sm font-medium">{voteCounts.no}</span>
+              <div className="flex gap-2 text-xs">
+                <div className="flex items-center gap-1">
+                  <span>👍</span>
+                  <span className="text-slate-300 font-medium">{voteCounts.yes}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span>👎</span>
+                  <span className="text-slate-300 font-medium">{voteCounts.no}</span>
+                </div>
               </div>
             </div>
           </div>
