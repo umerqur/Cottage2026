@@ -1,8 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation, useParams, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Home from './pages/Home'
 import Results from './pages/Results'
 import Admin from './pages/Admin'
+import Landing from './pages/Landing'
 import { getRoomByJoinCode, DEFAULT_JOIN_CODE } from './lib/supabase'
 import type { Room } from './types'
 
@@ -115,8 +116,8 @@ function App() {
     <Router>
       <div className="min-h-screen bg-cottage-cream">
         <Routes>
-          {/* Redirect root to default room */}
-          <Route path="/" element={<Navigate to={`/r/${DEFAULT_JOIN_CODE}`} replace />} />
+          {/* Landing page with Create Room flow */}
+          <Route path="/" element={<Landing />} />
 
           {/* Room-specific routes */}
           <Route path="/r/:joinCode/*" element={<RoomLoader />} />
