@@ -33,6 +33,11 @@ export interface Database {
 export const DEFAULT_ROOM_ID = '00000000-0000-0000-0000-000000000001'
 export const DEFAULT_JOIN_CODE = 'cottage2026'
 
+export interface CreateRoomInput {
+  name: string
+  joinCode: string
+}
+
 // Generate a random join code (6-8 chars, uppercase, no confusing chars like O, 0, I, 1, etc.)
 export function generateJoinCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // No O, 0, I, 1
@@ -59,7 +64,7 @@ export async function getDefaultRoom() {
   return getRoomByJoinCode(DEFAULT_JOIN_CODE)
 }
 
-export async function createRoom(room: Database['public']['Tables']['rooms']['Insert']) {
+export async function createRoom(room: CreateRoomInput) {
   const { name, joinCode } = room
 
   const { data, error } = await supabase
