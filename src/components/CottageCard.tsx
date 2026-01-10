@@ -12,9 +12,10 @@ interface CottageCardProps {
     maybe: number
     no: number
   }
+  highestScore?: number
 }
 
-export default function CottageCard({ option, userVote, onVote, onViewDetails, voteCounts }: CottageCardProps) {
+export default function CottageCard({ option, userVote, onVote, onViewDetails, voteCounts, highestScore }: CottageCardProps) {
   const [isVoting, setIsVoting] = useState(false)
   const [imageError, setImageError] = useState(false)
 
@@ -56,6 +57,29 @@ export default function CottageCard({ option, userVote, onVote, onViewDetails, v
   }
 
   const scoreValue = voteCounts ? voteCounts.yes - voteCounts.no : 0
+  const isHighestScore = highestScore !== undefined && scoreValue === highestScore && scoreValue > 0
+
+  // Determine badge styling based on score
+  const getBadgeClasses = () => {
+    let baseClasses = 'ml-2 flex-shrink-0 px-2.5 py-1 rounded text-sm font-bold'
+
+    if (scoreValue > 0) {
+      // Positive score: green background with white text
+      if (isHighestScore) {
+        // Highest score: brighter green with ring
+        return `${baseClasses} bg-emerald-500/90 text-white ring-2 ring-emerald-400/50`
+      } else {
+        // Regular positive: subtle green
+        return `${baseClasses} bg-emerald-600/80 text-white`
+      }
+    } else if (scoreValue < 0) {
+      // Negative score: red background with white text
+      return `${baseClasses} bg-rose-600/80 text-white`
+    } else {
+      // Zero score: neutral gray
+      return `${baseClasses} bg-slate-600/80 text-white`
+    }
+  }
 
   return (
     <div className="bg-slate-800/80 rounded-lg shadow-lg overflow-hidden border border-slate-700/50 hover:border-slate-600 transition-all backdrop-blur-sm flex flex-col">
@@ -105,7 +129,7 @@ export default function CottageCard({ option, userVote, onVote, onViewDetails, v
             <h3 className="text-xl font-bold text-white leading-tight">{option.nickname}</h3>
             {/* Score Badge - Top Right */}
             {voteCounts && (
-              <div className="ml-2 flex-shrink-0 bg-slate-700/80 backdrop-blur-sm border border-slate-600/50 text-white px-2.5 py-1 rounded text-sm font-bold">
+              <div className={getBadgeClasses()}>
                 {scoreValue > 0 ? `+${scoreValue}` : scoreValue}
               </div>
             )}

@@ -200,16 +200,26 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {options.map((option) => (
-            <CottageCard
-              key={option.id}
-              option={option}
-              userVote={userVotes[option.id]}
-              onVote={handleVote}
-              onViewDetails={setSelectedOption}
-              voteCounts={voteCounts[option.id]}
-            />
-          ))}
+          {options.map((option) => {
+            // Calculate highest score across all options
+            const allScores = options.map((opt) => {
+              const counts = voteCounts[opt.id]
+              return counts ? counts.yes - counts.no : 0
+            })
+            const highestScore = Math.max(...allScores)
+
+            return (
+              <CottageCard
+                key={option.id}
+                option={option}
+                userVote={userVotes[option.id]}
+                onVote={handleVote}
+                onViewDetails={setSelectedOption}
+                voteCounts={voteCounts[option.id]}
+                highestScore={highestScore}
+              />
+            )
+          })}
         </div>
       </div>
 
