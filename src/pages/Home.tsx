@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { User } from 'lucide-react'
 import CottageCard from '../components/CottageCard'
 import CottageModal from '../components/CottageModal'
 import { getOptions, getUserVote, upsertVote, getVotes } from '../lib/supabase'
@@ -166,43 +167,50 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Choose Your Cottage</h1>
-          <p className="text-slate-300">
-            Voting as <span className="font-semibold text-primary-400">{voterName}</span>
+      {/* Premium Header Bar */}
+      <div className="mb-8 -mt-6 -mx-6 px-6 py-5 bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-white tracking-tight">Cottage 2026</h1>
+          <div className="flex items-center gap-3 bg-slate-700/50 px-4 py-2 rounded-lg border border-slate-600/50">
+            <User className="w-4 h-4 text-slate-400" />
+            <span className="text-sm text-slate-300">
+              Voting as <span className="font-semibold text-white">{voterName}</span>
+            </span>
             <button
               onClick={() => {
                 localStorage.removeItem('cottageVoterName')
                 setNamePrompt(true)
                 setVoterName('')
               }}
-              className="ml-3 text-sm text-slate-400 hover:text-white transition-colors"
+              className="ml-2 text-xs px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white rounded transition-colors font-medium"
             >
-              (change)
+              Change
             </button>
-          </p>
+          </div>
         </div>
       </div>
 
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white mb-4">All Options</h2>
-        <p className="text-slate-400 mb-6">
-          Vote Yes, Maybe, or No for each cottage. Tap a card to view full details.
-        </p>
-      </div>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-white mb-2">All Options</h2>
+          <p className="text-slate-400 text-sm">
+            Vote Yes, Maybe, or No for each cottage. Tap a card to view full details.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {options.map((option) => (
-          <CottageCard
-            key={option.id}
-            option={option}
-            userVote={userVotes[option.id]}
-            onVote={handleVote}
-            onViewDetails={setSelectedOption}
-            voteCounts={voteCounts[option.id]}
-          />
-        ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {options.map((option) => (
+            <CottageCard
+              key={option.id}
+              option={option}
+              userVote={userVotes[option.id]}
+              onVote={handleVote}
+              onViewDetails={setSelectedOption}
+              voteCounts={voteCounts[option.id]}
+            />
+          ))}
+        </div>
       </div>
 
       <CottageModal option={selectedOption} onClose={() => setSelectedOption(null)} />

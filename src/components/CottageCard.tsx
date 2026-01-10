@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Users, BedDouble, Bath, MapPin, ExternalLink } from 'lucide-react'
 import type { CottageOption, VoteValue } from '../types'
 
 interface CottageCardProps {
@@ -31,118 +32,153 @@ export default function CottageCard({ option, userVote, onVote, onViewDetails, v
 
   const getVoteButtonClass = (vote: VoteValue) => {
     const isSelected = userVote === vote
-    const baseClass = 'flex-1 py-2 px-3 rounded-lg font-medium transition-all'
+    const baseClass = 'flex-1 h-10 px-3 rounded-lg font-medium transition-all border'
 
     if (vote === 'yes') {
       return `${baseClass} ${
         isSelected
-          ? 'bg-green-600 text-white shadow-lg'
-          : 'bg-slate-700 text-slate-300 hover:bg-green-600/20 hover:text-green-400'
+          ? 'bg-emerald-600/10 border-emerald-600/50 text-emerald-400'
+          : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-emerald-600/30 hover:text-emerald-400'
       }`
     } else if (vote === 'maybe') {
       return `${baseClass} ${
         isSelected
-          ? 'bg-yellow-600 text-white shadow-lg'
-          : 'bg-slate-700 text-slate-300 hover:bg-yellow-600/20 hover:text-yellow-400'
+          ? 'bg-amber-600/10 border-amber-600/50 text-amber-400'
+          : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-amber-600/30 hover:text-amber-400'
       }`
     } else {
       return `${baseClass} ${
         isSelected
-          ? 'bg-red-600 text-white shadow-lg'
-          : 'bg-slate-700 text-slate-300 hover:bg-red-600/20 hover:text-red-400'
+          ? 'bg-rose-600/10 border-rose-600/50 text-rose-400'
+          : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-rose-600/30 hover:text-rose-400'
       }`
     }
   }
 
+  const scoreValue = voteCounts ? voteCounts.yes - voteCounts.no : 0
+
   return (
-    <div className="bg-slate-800 rounded-xl shadow-xl overflow-hidden border border-slate-700 hover:border-primary-500 transition-all">
+    <div className="bg-slate-800/80 rounded-lg shadow-lg overflow-hidden border border-slate-700/50 hover:border-slate-600 transition-all backdrop-blur-sm flex flex-col">
+      {/* Image Section with Gradient Overlay */}
       <div
-        className="relative h-64 cursor-pointer group"
+        className="relative h-56 cursor-pointer group overflow-hidden"
         onClick={() => onViewDetails(option)}
       >
         {imageError ? (
-          <div className="w-full h-full bg-slate-700 flex items-center justify-center">
+          <div className="w-full h-full bg-slate-700/50 flex items-center justify-center">
             <div className="text-center text-slate-400">
-              <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-sm">Image not available</p>
+              <p className="text-xs">Image unavailable</p>
             </div>
           </div>
         ) : (
-          <img
-            src={option.imageUrls[0]}
-            alt={option.nickname}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={() => setImageError(true)}
-          />
+          <>
+            <img
+              src={option.imageUrls[0]}
+              alt={option.nickname}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={() => setImageError(true)}
+            />
+            {/* Subtle gradient for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+          </>
         )}
-        <div className="absolute top-4 left-4 bg-primary-600 text-white px-4 py-2 rounded-lg font-bold text-xl shadow-lg">
+
+        {/* Code Badge */}
+        <div className="absolute top-3 left-3 bg-slate-900/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-md font-bold text-sm shadow-lg border border-slate-700/50">
           {option.code}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
-          <span className="text-white font-medium">View Details</span>
+
+        {/* View Details Overlay */}
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <span className="text-white font-medium text-sm">View Details</span>
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-2xl font-bold text-white mb-1">{option.nickname}</h3>
-        <p className="text-slate-400 text-sm mb-3">{option.location}</p>
+      {/* Content Section */}
+      <div className="p-5 flex flex-col flex-grow">
+        {/* Title and Location */}
+        <div className="mb-4 flex-grow">
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="text-xl font-bold text-white leading-tight">{option.nickname}</h3>
+            {/* Score Badge - Top Right */}
+            {voteCounts && (
+              <div className="ml-2 flex-shrink-0 bg-slate-700/80 backdrop-blur-sm border border-slate-600/50 text-white px-2.5 py-1 rounded text-sm font-bold">
+                {scoreValue > 0 ? `+${scoreValue}` : scoreValue}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5 text-slate-400 text-sm mb-3">
+            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+            <span>{option.location}</span>
+          </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-slate-700/50 rounded-lg p-3">
-            <div className="text-slate-400 text-xs mb-1">Per Night</div>
-            <div className="text-white font-bold text-lg">${option.priceNight}</div>
-          </div>
-          <div className="bg-slate-700/50 rounded-lg p-3">
-            <div className="text-slate-400 text-xs mb-1">Total Est.</div>
-            <div className="text-white font-bold text-lg">${option.totalEstimate}</div>
-          </div>
-        </div>
-
-        <div className="flex gap-4 mb-4 text-sm text-slate-300">
-          <div className="flex items-center gap-1">
-            <span>👥</span>
-            <span>{option.guests} guests</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span>🛏️</span>
-            <span>{option.beds} beds</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span>🚿</span>
-            <span>{option.baths} baths</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          {option.perks.slice(0, 3).map((perk, index) => (
-            <span
-              key={index}
-              className="bg-primary-900/30 text-primary-300 px-3 py-1 rounded-full text-xs font-medium border border-primary-700/30"
-            >
-              {perk}
-            </span>
-          ))}
-          {option.perks.length > 3 && (
-            <span className="text-slate-400 text-xs py-1">
-              +{option.perks.length - 3} more
-            </span>
-          )}
-        </div>
-
-        {/* Vote Score Badge */}
-        {voteCounts && (
-          <div className="mb-4">
-            <div className="bg-primary-600 text-white px-3 py-3 rounded text-lg font-bold leading-none w-14 text-center">
-              {voteCounts.yes - voteCounts.no}
+          {/* Price Section */}
+          <div className="grid grid-cols-2 gap-2.5 mb-3">
+            <div className="bg-slate-700/30 backdrop-blur-sm rounded-md p-2.5 border border-slate-700/50">
+              <div className="text-slate-400 text-xs mb-0.5 font-medium">Per Night</div>
+              <div className="text-white font-bold">${option.priceNight}</div>
+            </div>
+            <div className="bg-slate-700/30 backdrop-blur-sm rounded-md p-2.5 border border-slate-700/50">
+              <div className="text-slate-400 text-xs mb-0.5 font-medium">Total Est.</div>
+              <div className="text-white font-bold">${option.totalEstimate}</div>
             </div>
           </div>
+
+          {/* Stats with Lucide Icons */}
+          <div className="flex gap-4 text-sm text-slate-300 mb-3">
+            <div className="flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-slate-400" />
+              <span>{option.guests}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <BedDouble className="w-4 h-4 text-slate-400" />
+              <span>{option.beds}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Bath className="w-4 h-4 text-slate-400" />
+              <span>{option.baths}</span>
+            </div>
+          </div>
+
+          {/* Perks */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {option.perks.slice(0, 3).map((perk, index) => (
+              <span
+                key={index}
+                className="bg-slate-700/40 text-slate-300 px-2.5 py-0.5 rounded text-xs font-medium border border-slate-600/30"
+              >
+                {perk}
+              </span>
+            ))}
+            {option.perks.length > 3 && (
+              <span className="text-slate-400 text-xs py-0.5">
+                +{option.perks.length - 3}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Airbnb Link Button */}
+        {!isTBD && (
+          <a
+            href={option.airbnbUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full bg-slate-700/40 hover:bg-slate-700 border border-slate-600/50 hover:border-slate-500 text-slate-300 hover:text-white py-2.5 px-3 rounded-lg transition-all mb-3 text-sm font-medium group"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span>View on Airbnb</span>
+            <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </a>
         )}
 
+        {/* Voting Section */}
         {!isTBD && (
-          <div className="border-t border-slate-700 pt-4">
-            <div className="text-slate-400 text-sm mb-2 font-medium">Your Vote</div>
+          <div className="pt-3 border-t border-slate-700/50">
+            <div className="text-slate-400 text-xs mb-2 font-medium">Your Vote</div>
             <div className="flex gap-2">
               <button
                 onClick={() => handleVote('yes')}
@@ -169,8 +205,8 @@ export default function CottageCard({ option, userVote, onVote, onViewDetails, v
           </div>
         )}
         {isTBD && (
-          <div className="border-t border-slate-700 pt-4">
-            <div className="text-slate-400 text-sm text-center italic">
+          <div className="pt-3 border-t border-slate-700/50">
+            <div className="text-slate-400 text-xs text-center italic">
               Details coming soon - voting not yet available
             </div>
           </div>
