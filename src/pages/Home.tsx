@@ -112,9 +112,9 @@ export default function Home() {
   if (namePrompt) {
     return (
       <div className="max-w-md mx-auto mt-20">
-        <div className="bg-slate-800 rounded-xl p-8 shadow-2xl border border-slate-700">
-          <h2 className="text-3xl font-bold text-white mb-2">Welcome to Cottage 2026!</h2>
-          <p className="text-slate-300 mb-6">
+        <div className="bg-white rounded-xl p-8 shadow-xl border border-cottage-sand">
+          <h2 className="text-3xl font-bold text-cottage-charcoal mb-2">Welcome to Cottage 2026!</h2>
+          <p className="text-cottage-gray mb-6">
             Please enter your name to start voting on cottage options
           </p>
           <form
@@ -129,11 +129,11 @@ export default function Home() {
               type="text"
               placeholder="Your name"
               autoFocus
-              className="w-full bg-slate-700 text-white rounded-lg px-4 py-3 mb-4 border border-slate-600 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+              className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-3 mb-4 border border-cottage-sand focus:border-cottage-green focus:ring-2 focus:ring-cottage-green/20 outline-none transition-all"
             />
             <button
               type="submit"
-              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-lg transition-colors shadow-lg"
+              className="w-full bg-cottage-green hover:bg-cottage-green/90 text-white font-semibold py-3 rounded-lg transition-colors shadow-md"
             >
               Start Voting
             </button>
@@ -147,8 +147,8 @@ export default function Home() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
-          <div className="text-slate-300">Loading cottage options...</div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cottage-green mx-auto mb-4"></div>
+          <div className="text-cottage-gray">Loading cottage options...</div>
         </div>
       </div>
     )
@@ -157,9 +157,9 @@ export default function Home() {
   if (error) {
     return (
       <div className="max-w-md mx-auto mt-20">
-        <div className="bg-red-900/20 border border-red-700 rounded-xl p-6 text-center">
-          <div className="text-red-400 text-lg mb-2">⚠️ Error</div>
-          <div className="text-slate-300">{error}</div>
+        <div className="bg-cottage-red/10 border border-cottage-red rounded-xl p-6 text-center">
+          <div className="text-cottage-red text-lg mb-2">⚠️ Error</div>
+          <div className="text-cottage-gray">{error}</div>
         </div>
       </div>
     )
@@ -168,13 +168,13 @@ export default function Home() {
   return (
     <div>
       {/* Premium Header Bar */}
-      <div className="mb-8 -mt-6 -mx-6 px-6 py-5 bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-sm">
+      <div className="mb-8 -mt-6 -mx-6 px-6 py-5 bg-white border-b border-cottage-sand shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-white tracking-tight">Cottage 2026</h1>
-          <div className="flex items-center gap-3 bg-slate-700/50 px-4 py-2 rounded-lg border border-slate-600/50">
-            <User className="w-4 h-4 text-slate-400" />
-            <span className="text-sm text-slate-300">
-              Voting as <span className="font-semibold text-white">{voterName}</span>
+          <h1 className="text-2xl font-bold text-cottage-charcoal tracking-tight">Cottage 2026</h1>
+          <div className="flex items-center gap-3 bg-cottage-sand/30 px-4 py-2 rounded-lg border border-cottage-sand">
+            <User className="w-4 h-4 text-cottage-gray" />
+            <span className="text-sm text-cottage-gray">
+              Voting as <span className="font-semibold text-cottage-charcoal">{voterName}</span>
             </span>
             <button
               onClick={() => {
@@ -182,7 +182,7 @@ export default function Home() {
                 setNamePrompt(true)
                 setVoterName('')
               }}
-              className="ml-2 text-xs px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white rounded transition-colors font-medium"
+              className="ml-2 text-xs px-3 py-1 bg-cottage-green hover:bg-cottage-green/90 text-white rounded transition-colors font-medium"
             >
               Change
             </button>
@@ -193,8 +193,8 @@ export default function Home() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-white mb-2">All Options</h2>
-          <p className="text-slate-400 text-sm">
+          <h2 className="text-xl font-semibold text-cottage-charcoal mb-2">All Options</h2>
+          <p className="text-cottage-gray text-sm">
             Vote Yes, Maybe, or No for each cottage. Tap a card to view full details.
           </p>
         </div>

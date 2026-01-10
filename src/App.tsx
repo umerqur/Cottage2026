@@ -7,10 +7,10 @@ function Navigation() {
   const location = useLocation()
 
   return (
-    <nav className="bg-slate-800 border-b border-slate-700">
+    <nav className="bg-white border-b border-cottage-sand shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-2xl font-bold text-white hover:text-primary-400 transition-colors">
+          <Link to="/" className="text-2xl font-bold text-cottage-charcoal hover:text-cottage-green transition-colors">
             Cottage 2026
           </Link>
           <div className="flex gap-4">
@@ -18,8 +18,8 @@ function Navigation() {
               to="/"
               className={`px-4 py-2 rounded-lg transition-colors ${
                 location.pathname === '/'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  ? 'bg-cottage-green text-white'
+                  : 'text-cottage-gray hover:bg-cottage-sand/30 hover:text-cottage-charcoal'
               }`}
             >
               Vote
@@ -28,8 +28,8 @@ function Navigation() {
               to="/results"
               className={`px-4 py-2 rounded-lg transition-colors ${
                 location.pathname === '/results'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  ? 'bg-cottage-green text-white'
+                  : 'text-cottage-gray hover:bg-cottage-sand/30 hover:text-cottage-charcoal'
               }`}
             >
               Results
@@ -38,8 +38,8 @@ function Navigation() {
               to="/admin"
               className={`px-4 py-2 rounded-lg transition-colors ${
                 location.pathname === '/admin'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  ? 'bg-cottage-green text-white'
+                  : 'text-cottage-gray hover:bg-cottage-sand/30 hover:text-cottage-charcoal'
               }`}
             >
               Admin
@@ -54,7 +54,7 @@ function Navigation() {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-slate-900">
+      <div className="min-h-screen bg-cottage-cream">
         <Navigation />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>

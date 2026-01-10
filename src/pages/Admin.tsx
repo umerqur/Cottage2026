@@ -97,9 +97,9 @@ export default function Admin() {
   if (!authenticated) {
     return (
       <div className="max-w-md mx-auto mt-20">
-        <div className="bg-slate-800 rounded-xl p-8 shadow-2xl border border-slate-700">
-          <h2 className="text-3xl font-bold text-white mb-2">Admin Access</h2>
-          <p className="text-slate-300 mb-6">Enter the admin password to continue</p>
+        <div className="bg-white rounded-xl p-8 shadow-xl border border-cottage-sand">
+          <h2 className="text-3xl font-bold text-cottage-charcoal mb-2">Admin Access</h2>
+          <p className="text-cottage-gray mb-6">Enter the admin password to continue</p>
           <form onSubmit={handleLogin}>
             <input
               type="password"
@@ -107,11 +107,11 @@ export default function Admin() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Admin password"
               autoFocus
-              className="w-full bg-slate-700 text-white rounded-lg px-4 py-3 mb-4 border border-slate-600 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+              className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-3 mb-4 border border-cottage-sand focus:border-cottage-green focus:ring-2 focus:ring-cottage-green/20 outline-none transition-all"
             />
             <button
               type="submit"
-              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-lg transition-colors shadow-lg"
+              className="w-full bg-cottage-green hover:bg-cottage-green/90 text-white font-semibold py-3 rounded-lg transition-colors shadow-md"
             >
               Login
             </button>
@@ -124,50 +124,50 @@ export default function Admin() {
   if (showEditForm && editingOption) {
     return (
       <div className="max-w-3xl mx-auto">
-        <div className="bg-slate-800 rounded-xl p-8 shadow-2xl border border-slate-700">
-          <h2 className="text-3xl font-bold text-white mb-6">
+        <div className="bg-white rounded-xl p-8 shadow-xl border border-cottage-sand">
+          <h2 className="text-3xl font-bold text-cottage-charcoal mb-6">
             Edit Option {editingOption.code}
           </h2>
           <form onSubmit={handleSaveOption} className="space-y-4">
             <div>
-              <label className="block text-slate-300 mb-2">Nickname</label>
+              <label className="block text-cottage-charcoal mb-2">Nickname</label>
               <input
                 type="text"
                 value={editingOption.nickname}
                 onChange={(e) =>
                   setEditingOption({ ...editingOption, nickname: e.target.value })
                 }
-                className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-2">Title</label>
+              <label className="block text-cottage-charcoal mb-2">Title</label>
               <input
                 type="text"
                 value={editingOption.title}
                 onChange={(e) =>
                   setEditingOption({ ...editingOption, title: e.target.value })
                 }
-                className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-2">Location</label>
+              <label className="block text-cottage-charcoal mb-2">Location</label>
               <input
                 type="text"
                 value={editingOption.location}
                 onChange={(e) =>
                   setEditingOption({ ...editingOption, location: e.target.value })
                 }
-                className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-300 mb-2">Price per Night</label>
+                <label className="block text-cottage-charcoal mb-2">Price per Night</label>
                 <input
                   type="number"
                   value={editingOption.priceNight}
@@ -177,12 +177,12 @@ export default function Admin() {
                       priceNight: parseInt(e.target.value),
                     })
                   }
-                  className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                  className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-2">Total Estimate</label>
+                <label className="block text-cottage-charcoal mb-2">Total Estimate</label>
                 <input
                   type="number"
                   value={editingOption.totalEstimate}
@@ -192,38 +192,38 @@ export default function Admin() {
                       totalEstimate: parseInt(e.target.value),
                     })
                   }
-                  className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                  className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-slate-300 mb-2">Max Guests</label>
+                <label className="block text-cottage-charcoal mb-2">Max Guests</label>
                 <input
                   type="number"
                   value={editingOption.guests}
                   onChange={(e) =>
                     setEditingOption({ ...editingOption, guests: parseInt(e.target.value) })
                   }
-                  className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                  className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-2">Bedrooms</label>
+                <label className="block text-cottage-charcoal mb-2">Bedrooms</label>
                 <input
                   type="number"
                   value={editingOption.beds}
                   onChange={(e) =>
                     setEditingOption({ ...editingOption, beds: parseInt(e.target.value) })
                   }
-                  className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                  className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-2">Bathrooms</label>
+                <label className="block text-cottage-charcoal mb-2">Bathrooms</label>
                 <input
                   type="number"
                   step="0.5"
@@ -231,13 +231,13 @@ export default function Admin() {
                   onChange={(e) =>
                     setEditingOption({ ...editingOption, baths: parseFloat(e.target.value) })
                   }
-                  className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                  className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-2">
+              <label className="block text-cottage-charcoal mb-2">
                 Perks (comma separated)
               </label>
               <input
@@ -249,24 +249,24 @@ export default function Admin() {
                     perks: e.target.value.split(',').map((p) => p.trim()),
                   })
                 }
-                className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-2">Airbnb URL</label>
+              <label className="block text-cottage-charcoal mb-2">Airbnb URL</label>
               <input
                 type="url"
                 value={editingOption.airbnbUrl}
                 onChange={(e) =>
                   setEditingOption({ ...editingOption, airbnbUrl: e.target.value })
                 }
-                className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-2">
+              <label className="block text-cottage-charcoal mb-2">
                 Image URLs (comma separated)
               </label>
               <input
@@ -278,19 +278,19 @@ export default function Admin() {
                     imageUrls: e.target.value.split(',').map((u) => u.trim()),
                   })
                 }
-                className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-2">Notes</label>
+              <label className="block text-cottage-charcoal mb-2">Notes</label>
               <textarea
                 value={editingOption.notes || ''}
                 onChange={(e) =>
                   setEditingOption({ ...editingOption, notes: e.target.value })
                 }
                 rows={3}
-                className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-primary-500 outline-none"
+                className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-2 border border-cottage-sand focus:border-cottage-green outline-none"
               />
             </div>
 
@@ -298,7 +298,7 @@ export default function Admin() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                className="flex-1 bg-cottage-green hover:bg-cottage-green/90 disabled:bg-cottage-sand text-white font-semibold py-3 rounded-lg transition-colors"
               >
                 {loading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -308,7 +308,7 @@ export default function Admin() {
                   setShowEditForm(false)
                   setEditingOption(null)
                 }}
-                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 rounded-lg transition-colors"
+                className="flex-1 bg-white hover:bg-cottage-sand/30 border border-cottage-sand text-cottage-charcoal font-semibold py-3 rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -321,43 +321,43 @@ export default function Admin() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-white mb-8">Admin Dashboard</h1>
+      <h1 className="text-4xl font-bold text-cottage-charcoal mb-8">Admin Dashboard</h1>
 
       <div className="mb-8">
         <button
           onClick={handleResetVotes}
-          className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-lg"
+          className="bg-cottage-red hover:bg-cottage-red/90 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-md"
         >
           Reset All Votes
         </button>
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-white mb-4">Manage Options</h2>
+        <h2 className="text-2xl font-bold text-cottage-charcoal mb-4">Manage Options</h2>
         {loading ? (
-          <div className="text-slate-300">Loading...</div>
+          <div className="text-cottage-gray">Loading...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {options.map((option) => (
               <div
                 key={option.id}
-                className="bg-slate-800 border border-slate-700 rounded-xl p-6"
+                className="bg-white border border-cottage-sand rounded-xl p-6 shadow-md"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-primary-600 text-white px-3 py-1 rounded-lg font-bold">
+                      <span className="bg-cottage-green text-white px-3 py-1 rounded-lg font-bold">
                         {option.code}
                       </span>
-                      <span className="text-xl font-bold text-white">
+                      <span className="text-xl font-bold text-cottage-charcoal">
                         {option.nickname}
                       </span>
                     </div>
-                    <p className="text-slate-400 text-sm">{option.location}</p>
+                    <p className="text-cottage-gray text-sm">{option.location}</p>
                   </div>
                 </div>
 
-                <div className="space-y-1 text-sm text-slate-300 mb-4">
+                <div className="space-y-1 text-sm text-cottage-charcoal mb-4">
                   <div>${option.priceNight}/night • ${option.totalEstimate} total</div>
                   <div>
                     {option.guests} guests • {option.beds} beds • {option.baths} baths
@@ -366,7 +366,7 @@ export default function Admin() {
 
                 <button
                   onClick={() => handleEditOption(option)}
-                  className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 rounded-lg transition-colors"
+                  className="w-full bg-cottage-green hover:bg-cottage-green/90 text-white font-medium py-2 rounded-lg transition-colors"
                 >
                   Edit
                 </button>

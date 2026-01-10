@@ -59,30 +59,30 @@ export default function Results() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
-          <div className="text-slate-300">Loading results...</div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cottage-green mx-auto mb-4"></div>
+          <div className="text-cottage-gray">Loading results...</div>
         </div>
       </div>
     )
   }
 
   const getRankIcon = (index: number) => {
-    if (index === 0) return <Trophy className="w-5 h-5 text-amber-400" />
-    if (index === 1) return <Medal className="w-5 h-5 text-slate-300" />
-    if (index === 2) return <Award className="w-5 h-5 text-amber-600" />
+    if (index === 0) return <Trophy className="w-5 h-5 text-cottage-amber" />
+    if (index === 1) return <Medal className="w-5 h-5 text-cottage-gray" />
+    if (index === 2) return <Award className="w-5 h-5 text-cottage-tan" />
     return null
   }
 
   return (
     <div className="max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold text-white mb-2">Results Dashboard</h1>
-      <p className="text-slate-400 mb-8 text-sm">Real-time vote summary for all cottage options</p>
+      <h1 className="text-3xl font-bold text-cottage-charcoal mb-2">Results Dashboard</h1>
+      <p className="text-cottage-gray mb-8 text-sm">Real-time vote summary for all cottage options</p>
 
       {/* Leaderboard Section */}
       {voteSummaries.length > 0 && voteSummaries.some(s => s.total > 0) && (
-        <div className="mb-8 bg-gradient-to-br from-slate-800/50 to-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-400" />
+        <div className="mb-8 bg-white border border-cottage-sand rounded-lg p-6 shadow-md">
+          <h2 className="text-lg font-semibold text-cottage-charcoal mb-4 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-cottage-amber" />
             Top Choices
           </h2>
           <div className="space-y-3">
@@ -91,23 +91,23 @@ export default function Results() {
               return (
                 <div
                   key={summary.option.id}
-                  className="flex items-center gap-4 bg-slate-800/60 backdrop-blur-sm rounded-lg p-4 border border-slate-700/50"
+                  className="flex items-center gap-4 bg-cottage-sand/20 rounded-lg p-4 border border-cottage-sand"
                 >
                   <div className="flex items-center justify-center w-8">
                     {getRankIcon(index)}
                   </div>
-                  <div className="bg-slate-700/80 text-white px-3 py-1.5 rounded font-bold text-sm min-w-[2.5rem] text-center">
+                  <div className="bg-cottage-green text-white px-3 py-1.5 rounded font-bold text-sm min-w-[2.5rem] text-center">
                     {summary.option.code}
                   </div>
                   <div className="flex-grow">
-                    <div className="text-white font-semibold">{summary.option.nickname}</div>
-                    <div className="text-slate-400 text-xs">{summary.option.location}</div>
+                    <div className="text-cottage-charcoal font-semibold">{summary.option.nickname}</div>
+                    <div className="text-cottage-gray text-xs">{summary.option.location}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-white font-bold text-lg">
+                    <div className="text-cottage-charcoal font-bold text-lg">
                       {summary.score > 0 ? `+${summary.score}` : summary.score}
                     </div>
-                    <div className="text-slate-400 text-xs">{summary.total} votes</div>
+                    <div className="text-cottage-gray text-xs">{summary.total} votes</div>
                   </div>
                 </div>
               )
@@ -118,7 +118,7 @@ export default function Results() {
 
       {/* Vote Breakdown Section */}
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-white mb-4">Vote Breakdown</h2>
+        <h2 className="text-lg font-semibold text-cottage-charcoal mb-4">Vote Breakdown</h2>
         {voteSummaries.map((summary) => {
           const { option, yes, maybe, no, total, score } = summary
 
@@ -130,31 +130,31 @@ export default function Results() {
           return (
             <div
               key={option.id}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg p-5 hover:border-slate-600/50 transition-all"
+              className="bg-white border border-cottage-sand rounded-lg p-5 hover:border-cottage-tan/50 transition-all shadow-sm"
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <span className="bg-slate-700/80 text-white px-3 py-1.5 rounded font-bold text-sm">
+                  <span className="bg-cottage-green text-white px-3 py-1.5 rounded font-bold text-sm">
                     {option.code}
                   </span>
                   <div>
-                    <span className="text-white font-semibold">
+                    <span className="text-cottage-charcoal font-semibold">
                       {option.nickname}
                     </span>
-                    <div className="text-slate-400 text-xs">{option.location}</div>
+                    <div className="text-cottage-gray text-xs">{option.location}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <div className="text-slate-400 text-xs">Score</div>
-                    <div className="text-white font-bold">
+                    <div className="text-cottage-gray text-xs">Score</div>
+                    <div className="text-cottage-charcoal font-bold">
                       {score > 0 ? `+${score}` : score}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-slate-400 text-xs">Total</div>
-                    <div className="text-white font-bold">
+                    <div className="text-cottage-gray text-xs">Total</div>
+                    <div className="text-cottage-charcoal font-bold">
                       {total}
                     </div>
                   </div>
@@ -164,11 +164,11 @@ export default function Results() {
               {/* Horizontal Bar Chart */}
               {total > 0 ? (
                 <div className="space-y-3">
-                  <div className="flex h-10 rounded-lg overflow-hidden bg-slate-700/20 border border-slate-700/30">
-                    {/* Yes segment - Muted emerald */}
+                  <div className="flex h-10 rounded-lg overflow-hidden bg-cottage-sand/30 border border-cottage-sand">
+                    {/* Yes segment - Green */}
                     {yes > 0 && (
                       <div
-                        className="bg-emerald-700/80 flex items-center justify-center text-white text-sm font-semibold transition-all hover:bg-emerald-700"
+                        className="bg-cottage-green flex items-center justify-center text-white text-sm font-semibold transition-all hover:bg-cottage-green/90"
                         style={{ width: `${yesPercent}%` }}
                       >
                         {yesPercent >= 12 && (
@@ -177,10 +177,10 @@ export default function Results() {
                       </div>
                     )}
 
-                    {/* Maybe segment - Muted amber */}
+                    {/* Maybe segment - Amber */}
                     {maybe > 0 && (
                       <div
-                        className="bg-amber-700/80 flex items-center justify-center text-white text-sm font-semibold transition-all hover:bg-amber-700"
+                        className="bg-cottage-amber flex items-center justify-center text-white text-sm font-semibold transition-all hover:bg-cottage-amber/90"
                         style={{ width: `${maybePercent}%` }}
                       >
                         {maybePercent >= 12 && (
@@ -189,10 +189,10 @@ export default function Results() {
                       </div>
                     )}
 
-                    {/* No segment - Muted rose */}
+                    {/* No segment - Red */}
                     {no > 0 && (
                       <div
-                        className="bg-rose-800/80 flex items-center justify-center text-white text-sm font-semibold transition-all hover:bg-rose-800"
+                        className="bg-cottage-red flex items-center justify-center text-white text-sm font-semibold transition-all hover:bg-cottage-red/90"
                         style={{ width: `${noPercent}%` }}
                       >
                         {noPercent >= 12 && (
@@ -205,27 +205,27 @@ export default function Results() {
                   {/* Legend */}
                   <div className="flex gap-6 justify-center text-xs">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-emerald-700/80 rounded"></div>
-                      <span className="text-slate-400">
-                        Yes: <span className="font-semibold text-slate-300">{yes}</span>
+                      <div className="w-3 h-3 bg-cottage-green rounded"></div>
+                      <span className="text-cottage-gray">
+                        Yes: <span className="font-semibold text-cottage-charcoal">{yes}</span>
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-amber-700/80 rounded"></div>
-                      <span className="text-slate-400">
-                        Maybe: <span className="font-semibold text-slate-300">{maybe}</span>
+                      <div className="w-3 h-3 bg-cottage-amber rounded"></div>
+                      <span className="text-cottage-gray">
+                        Maybe: <span className="font-semibold text-cottage-charcoal">{maybe}</span>
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-rose-800/80 rounded"></div>
-                      <span className="text-slate-400">
-                        No: <span className="font-semibold text-slate-300">{no}</span>
+                      <div className="w-3 h-3 bg-cottage-red rounded"></div>
+                      <span className="text-cottage-gray">
+                        No: <span className="font-semibold text-cottage-charcoal">{no}</span>
                       </span>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-6 text-slate-400 bg-slate-700/10 rounded-lg border border-slate-700/20 text-sm">
+                <div className="text-center py-6 text-cottage-gray bg-cottage-sand/20 rounded-lg border border-cottage-sand text-sm">
                   No votes yet for this option
                 </div>
               )}
@@ -235,10 +235,10 @@ export default function Results() {
       </div>
 
       {voteSummaries.every(s => s.total === 0) && (
-        <div className="mt-8 text-center p-8 bg-slate-800/50 border border-slate-700/50 rounded-lg backdrop-blur-sm">
-          <div className="text-slate-400">
+        <div className="mt-8 text-center p-8 bg-white border border-cottage-sand rounded-lg shadow-md">
+          <div className="text-cottage-gray">
             No votes have been cast yet. Head to the{' '}
-            <a href="/" className="text-primary-400 hover:text-primary-300 font-semibold">
+            <a href="/" className="text-cottage-green hover:text-cottage-green/80 font-semibold">
               Home page
             </a>
             {' '}to start voting!
