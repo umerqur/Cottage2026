@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { CottageOption, Vote } from '../types'
+import type { CottageOption, Vote, Room } from '../types'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
@@ -10,6 +10,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export interface Database {
   public: {
     Tables: {
+      rooms: {
+        Row: Room
+        Insert: Omit<Room, 'id' | 'createdAt'>
+        Update: Partial<Omit<Room, 'id' | 'createdAt'>>
+      }
       options: {
         Row: CottageOption
         Insert: Omit<CottageOption, 'id' | 'createdAt'>
@@ -24,11 +29,42 @@ export interface Database {
   }
 }
 
+// Rooms API
+export const DEFAULT_ROOM_ID = '00000000-0000-0000-0000-000000000001'
+export const DEFAULT_JOIN_CODE = 'cottage2026'
+
+export async function getRoomByJoinCode(joinCode: string) {
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('*')
+    .eq('joinCode', joinCode)
+    .single()
+
+  if (error) throw error
+  return data as Room
+}
+
+export async function getDefaultRoom() {
+  return getRoomByJoinCode(DEFAULT_JOIN_CODE)
+}
+
+export async function createRoom(room: Database['public']['Tables']['rooms']['Insert']) {
+  const { data, error } = await supabase
+    .from('rooms')
+    .insert(room)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as Room
+}
+
 // Options API
-export async function getOptions() {
+export async function getOptions(roomId: string) {
   const { data, error } = await supabase
     .from('options')
     .select('*')
+    .eq('roomId', roomId)
     .order('code', { ascending: true })
 
   if (error) throw error
@@ -70,20 +106,22 @@ export async function updateOption(id: string, option: Database['public']['Table
 }
 
 // Votes API
-export async function getVotes() {
+export async function getVotes(roomId: string) {
   const { data, error } = await supabase
     .from('votes')
     .select('*')
+    .eq('roomId', roomId)
     .order('createdAt', { ascending: false })
 
   if (error) throw error
   return data as Vote[]
 }
 
-export async function getUserVote(voterName: string, optionId: string) {
+export async function getUserVote(roomId: string, voterName: string, optionId: string) {
   const { data, error } = await supabase
     .from('votes')
     .select('*')
+    .eq('roomId', roomId)
     .eq('voterName', voterName)
     .eq('optionId', optionId)
     .maybeSingle()
@@ -94,7 +132,7 @@ export async function getUserVote(voterName: string, optionId: string) {
 
 export async function upsertVote(vote: Database['public']['Tables']['votes']['Insert']) {
   // Check if vote exists
-  const existing = await getUserVote(vote.voterName, vote.optionId)
+  const existing = await getUserVote(vote.roomId, vote.voterName, vote.optionId)
 
   if (existing) {
     // Update existing vote
@@ -120,11 +158,12 @@ export async function upsertVote(vote: Database['public']['Tables']['votes']['In
   }
 }
 
-export async function deleteAllVotes() {
+export async function deleteAllVotes(roomId: string) {
   const { error } = await supabase
     .from('votes')
     .delete()
-    .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
+    .eq('roomId', roomId)
+    .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all in room
 
   if (error) throw error
 }

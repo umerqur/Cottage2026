@@ -4,10 +4,19 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Rooms table
+CREATE TABLE IF NOT EXISTS rooms (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "joinCode" VARCHAR(20) NOT NULL UNIQUE,
+  name VARCHAR(200) NOT NULL,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Options table
 CREATE TABLE IF NOT EXISTS options (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  code VARCHAR(1) NOT NULL UNIQUE CHECK (code IN ('A', 'B', 'C', 'D')),
+  "roomId" UUID NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+  code VARCHAR(1) NOT NULL,
   nickname VARCHAR(100) NOT NULL,
   title VARCHAR(200) NOT NULL,
   location VARCHAR(200) NOT NULL,
@@ -20,17 +29,20 @@ CREATE TABLE IF NOT EXISTS options (
   "airbnbUrl" TEXT NOT NULL,
   "imageUrls" TEXT[] NOT NULL DEFAULT '{}',
   notes TEXT,
-  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE("roomId", code),
+  CHECK (code IN ('A', 'B', 'C', 'D'))
 );
 
 -- Votes table
 CREATE TABLE IF NOT EXISTS votes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "roomId" UUID NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
   "voterName" VARCHAR(100) NOT NULL,
   "optionId" UUID NOT NULL REFERENCES options(id) ON DELETE CASCADE,
   "voteValue" VARCHAR(10) NOT NULL CHECK ("voteValue" IN ('yes', 'maybe', 'no')),
   "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE("voterName", "optionId")
+  UNIQUE("roomId", "voterName", "optionId")
 );
 
 -- Rankings table
@@ -44,28 +56,38 @@ CREATE TABLE IF NOT EXISTS rankings (
 );
 
 -- Create indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_rooms_join_code ON rooms("joinCode");
+CREATE INDEX IF NOT EXISTS idx_options_room_id ON options("roomId");
+CREATE INDEX IF NOT EXISTS idx_votes_room_id ON votes("roomId");
 CREATE INDEX IF NOT EXISTS idx_votes_voter_name ON votes("voterName");
 CREATE INDEX IF NOT EXISTS idx_votes_option_id ON votes("optionId");
 CREATE INDEX IF NOT EXISTS idx_rankings_voter_name ON rankings("voterName");
 CREATE INDEX IF NOT EXISTS idx_rankings_first_option ON rankings("firstOptionId");
 CREATE INDEX IF NOT EXISTS idx_rankings_second_option ON rankings("secondOptionId");
 
+-- Create default room
+INSERT INTO rooms (id, "joinCode", name) VALUES
+('00000000-0000-0000-0000-000000000001'::UUID, 'cottage2026', 'Cottage 2026 - Default Room')
+ON CONFLICT ("joinCode") DO NOTHING;
+
 -- Insert sample data (4 cottage options)
 -- Updated with actual Airbnb listings for June 26-29, 2026
 -- NOTE: Options A and B currently share the same Airbnb URL (both point to room 50855351)
-INSERT INTO options (code, nickname, title, location, "priceNight", "totalEstimate", guests, beds, baths, perks, "airbnbUrl", "imageUrls", notes) VALUES
-('A', 'Maple Gateway', 'The Maple Gateway', 'Ontario, Canada', 450, 1800, 7, 4, 2.0, ARRAY['Sleeps 7', 'Lakefront', 'Private beach', 'Fire pit'], 'https://www.airbnb.ca/rooms/50855351?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P30G3hzmZG8xA0pQ&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/Maple_Getaway.png'], 'Beautiful gateway cottage'),
-('B', 'Family Retreat', 'Lakefront Family Retreat', 'Ontario, Canada', 450, 1800, 7, 4, 2.0, ARRAY['Sleeps 7', 'Lakefront', 'Private beach', 'Fire pit'], 'https://www.airbnb.ca/rooms/50855351?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P30G3hzmZG8xA0pQ&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/Lakefront_Family_Retreat.png'], 'NOTE: Shares same Airbnb URL as Option A'),
-('C', 'Pines & Paddles', 'Pines and Paddles Family Cottage', 'Ontario, Canada', 420, 1680, 7, 4, 2.0, ARRAY['Sleeps 7', 'Waterfront', 'Kayaks', 'Family-friendly'], 'https://www.airbnb.ca/rooms/1047994884766848427?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3P8WKivwuvKMWse&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/Pines_Paddles_Family_Cottage.png'], 'Perfect for family adventures'),
-('D', 'Paradise Lake', 'Paradise Lake House, all seasons.', 'Ontario, Canada', 400, 1600, 7, 4, 2.0, ARRAY['Sleeps 7', 'All-season', 'Lake access', 'Year-round'], 'https://www.airbnb.ca/rooms/39502464?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3vpS2cFSOgLqSMw&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/Paradise_Lake_House.png'], 'Beautiful all-season lake house')
-ON CONFLICT (code) DO NOTHING;
+INSERT INTO options ("roomId", code, nickname, title, location, "priceNight", "totalEstimate", guests, beds, baths, perks, "airbnbUrl", "imageUrls", notes) VALUES
+('00000000-0000-0000-0000-000000000001'::UUID, 'A', 'Maple Gateway', 'The Maple Gateway', 'Ontario, Canada', 450, 1800, 7, 4, 2.0, ARRAY['Sleeps 7', 'Lakefront', 'Private beach', 'Fire pit'], 'https://www.airbnb.ca/rooms/50855351?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P30G3hzmZG8xA0pQ&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/Maple_Getaway.png'], 'Beautiful gateway cottage'),
+('00000000-0000-0000-0000-000000000001'::UUID, 'B', 'Family Retreat', 'Lakefront Family Retreat', 'Ontario, Canada', 450, 1800, 7, 4, 2.0, ARRAY['Sleeps 7', 'Lakefront', 'Private beach', 'Fire pit'], 'https://www.airbnb.ca/rooms/50855351?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P30G3hzmZG8xA0pQ&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/Lakefront_Family_Retreat.png'], 'NOTE: Shares same Airbnb URL as Option A'),
+('00000000-0000-0000-0000-000000000001'::UUID, 'C', 'Pines & Paddles', 'Pines and Paddles Family Cottage', 'Ontario, Canada', 420, 1680, 7, 4, 2.0, ARRAY['Sleeps 7', 'Waterfront', 'Kayaks', 'Family-friendly'], 'https://www.airbnb.ca/rooms/1047994884766848427?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3P8WKivwuvKMWse&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/Pines_Paddles_Family_Cottage.png'], 'Perfect for family adventures'),
+('00000000-0000-0000-0000-000000000001'::UUID, 'D', 'Paradise Lake', 'Paradise Lake House, all seasons.', 'Ontario, Canada', 400, 1600, 7, 4, 2.0, ARRAY['Sleeps 7', 'All-season', 'Lake access', 'Year-round'], 'https://www.airbnb.ca/rooms/39502464?adults=7&check_in=2026-06-26&check_out=2026-06-29&search_mode=regular_search&source_impression_id=p3_1767886134_P3vpS2cFSOgLqSMw&previous_page_section_name=1000&federated_search_id=3372d947-ab47-40b4-867d-065ec45afc34', ARRAY['/options/Paradise_Lake_House.png'], 'Beautiful all-season lake house')
+ON CONFLICT ("roomId", code) DO NOTHING;
 
 -- Enable Row Level Security (RLS)
+ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE options ENABLE ROW LEVEL SECURITY;
 ALTER TABLE votes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rankings ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for public read access
+CREATE POLICY "Allow public read access on rooms" ON rooms FOR SELECT USING (true);
 CREATE POLICY "Allow public read access on options" ON options FOR SELECT USING (true);
 CREATE POLICY "Allow public read access on votes" ON votes FOR SELECT USING (true);
 CREATE POLICY "Allow public read access on rankings" ON rankings FOR SELECT USING (true);
@@ -85,6 +107,7 @@ CREATE POLICY "Allow public update on options" ON options FOR UPDATE USING (true
 
 -- Grant necessary permissions
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT ALL ON rooms TO anon, authenticated;
 GRANT ALL ON options TO anon, authenticated;
 GRANT ALL ON votes TO anon, authenticated;
 GRANT ALL ON rankings TO anon, authenticated;

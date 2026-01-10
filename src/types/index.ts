@@ -1,7 +1,15 @@
 export type VoteValue = 'yes' | 'maybe' | 'no'
 
+export interface Room {
+  id: string
+  joinCode: string
+  name: string
+  createdAt: string
+}
+
 export interface CottageOption {
   id: string
+  roomId: string
   code: string
   nickname: string
   title: string
@@ -20,6 +28,7 @@ export interface CottageOption {
 
 export interface Vote {
   id: string
+  roomId: string
   voterName: string
   optionId: string
   voteValue: VoteValue

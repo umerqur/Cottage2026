@@ -8,7 +8,11 @@ import type { CottageOption } from '../types'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'cottage2026admin'
 
-export default function Admin() {
+interface AdminProps {
+  roomId: string
+}
+
+export default function Admin({ roomId }: AdminProps) {
   const [authenticated, setAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
   const [options, setOptions] = useState<CottageOption[]>([])
@@ -20,12 +24,12 @@ export default function Admin() {
     if (authenticated) {
       loadOptions()
     }
-  }, [authenticated])
+  }, [authenticated, roomId])
 
   const loadOptions = async () => {
     try {
       setLoading(true)
-      const data = await getOptions()
+      const data = await getOptions(roomId)
       setOptions(data)
     } catch (err) {
       console.error('Error loading options:', err)
@@ -44,12 +48,12 @@ export default function Admin() {
   }
 
   const handleResetVotes = async () => {
-    if (!confirm('Are you sure you want to reset ALL votes? This cannot be undone.')) {
+    if (!confirm('Are you sure you want to reset ALL votes in this room? This cannot be undone.')) {
       return
     }
 
     try {
-      await deleteAllVotes()
+      await deleteAllVotes(roomId)
       alert('All votes have been reset!')
     } catch (err) {
       console.error('Error resetting votes:', err)

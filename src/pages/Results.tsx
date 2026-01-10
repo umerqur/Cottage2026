@@ -12,20 +12,24 @@ interface VoteSummary {
   score: number
 }
 
-export default function Results() {
+interface ResultsProps {
+  roomId: string
+}
+
+export default function Results({ roomId }: ResultsProps) {
   const [voteSummaries, setVoteSummaries] = useState<VoteSummary[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadResults()
-  }, [])
+  }, [roomId])
 
   const loadResults = async () => {
     try {
       setLoading(true)
       const [optionsData, votesData] = await Promise.all([
-        getOptions(),
-        getVotes(),
+        getOptions(roomId),
+        getVotes(roomId),
       ])
 
       const summaries: VoteSummary[] = optionsData.map((option) => {
