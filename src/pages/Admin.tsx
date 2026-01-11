@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
-import { Plus, Upload, X } from 'lucide-react'
+import { Plus, Upload, X, User } from 'lucide-react'
 import {
   getOptions,
   createOption,
   updateOption,
   deleteAllVotes,
   uploadOptionImage,
+  getRoomById,
 } from '../lib/supabase'
-import type { CottageOption } from '../types'
-
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'cottage2026admin'
+import type { CottageOption, Room } from '../types'
 
 interface AdminProps {
   roomId: string
+  joinCode: string
 }
 
 interface NewOptionForm {
@@ -30,11 +30,14 @@ interface NewOptionForm {
   notes: string
 }
 
-export default function Admin({ roomId }: AdminProps) {
-  const [authenticated, setAuthenticated] = useState(false)
-  const [password, setPassword] = useState('')
+export default function Admin({ roomId, joinCode }: AdminProps) {
+  const [userName, setUserName] = useState('')
+  const [namePrompt, setNamePrompt] = useState(true)
+  const [room, setRoom] = useState<Room | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [options, setOptions] = useState<CottageOption[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [editingOption, setEditingOption] = useState<CottageOption | null>(null)
   const [showEditForm, setShowEditForm] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -57,10 +60,47 @@ export default function Admin({ roomId }: AdminProps) {
   })
 
   useEffect(() => {
-    if (authenticated) {
-      loadOptions()
+    // Check localStorage for saved name (room-scoped)
+    const savedName = localStorage.getItem(`cottageAdminName:${joinCode}`)
+    if (savedName) {
+      setUserName(savedName)
+      setNamePrompt(false)
+      loadRoomData(savedName)
     }
-  }, [authenticated, roomId])
+  }, [joinCode, roomId])
+
+  const loadRoomData = async (name: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const roomData = await getRoomById(roomId)
+      setRoom(roomData)
+
+      // Check if user is admin
+      const userIsAdmin = roomData.adminName === name
+      setIsAdmin(userIsAdmin)
+
+      if (userIsAdmin) {
+        await loadOptions()
+      }
+    } catch (err) {
+      console.error('Error loading room data:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load room data.'
+      setError(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSetName = (name: string) => {
+    if (!name.trim()) return
+
+    const trimmedName = name.trim()
+    setUserName(trimmedName)
+    localStorage.setItem(`cottageAdminName:${joinCode}`, trimmedName)
+    setNamePrompt(false)
+    loadRoomData(trimmedName)
+  }
 
   const loadOptions = async () => {
     try {
@@ -69,17 +109,10 @@ export default function Admin({ roomId }: AdminProps) {
       setOptions(data)
     } catch (err) {
       console.error('Error loading options:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load options.'
+      setError(errorMessage)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true)
-    } else {
-      alert('Incorrect password')
     }
   }
 
@@ -93,7 +126,8 @@ export default function Admin({ roomId }: AdminProps) {
       alert('All votes have been reset!')
     } catch (err) {
       console.error('Error resetting votes:', err)
-      alert('Failed to reset votes. Check console for details.')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to reset votes.'
+      alert(errorMessage)
     }
   }
 
@@ -128,7 +162,8 @@ export default function Admin({ roomId }: AdminProps) {
       alert('Option updated successfully!')
     } catch (err) {
       console.error('Error updating option:', err)
-      alert('Failed to update option. Check console for details.')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update option.'
+      alert(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -205,25 +240,31 @@ export default function Admin({ roomId }: AdminProps) {
       alert('Option created successfully!')
     } catch (err) {
       console.error('Error creating option:', err)
-      alert('Failed to create option. Check console for details.')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create option.'
+      alert(errorMessage)
     } finally {
       setLoading(false)
       setUploadingImage(false)
     }
   }
 
-  if (!authenticated) {
+  if (namePrompt) {
     return (
       <div className="max-w-md mx-auto mt-20">
         <div className="bg-white rounded-xl p-8 shadow-xl border border-cottage-sand">
           <h2 className="text-3xl font-bold text-cottage-charcoal mb-2">Admin Access</h2>
-          <p className="text-cottage-gray mb-6">Enter the admin password to continue</p>
-          <form onSubmit={handleLogin}>
+          <p className="text-cottage-gray mb-6">Enter your name to continue</p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              const input = e.currentTarget.elements.namedItem('name') as HTMLInputElement
+              handleSetName(input.value)
+            }}
+          >
             <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Admin password"
+              name="name"
+              type="text"
+              placeholder="Your name"
               autoFocus
               className="w-full bg-white text-cottage-charcoal rounded-lg px-4 py-3 mb-4 border border-cottage-sand focus:border-cottage-green focus:ring-2 focus:ring-cottage-green/20 outline-none transition-all"
             />
@@ -231,9 +272,60 @@ export default function Admin({ roomId }: AdminProps) {
               type="submit"
               className="w-full bg-cottage-green hover:bg-cottage-green/90 text-white font-semibold py-3 rounded-lg transition-colors shadow-md"
             >
-              Login
+              Continue
             </button>
           </form>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading && !room) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cottage-green mx-auto mb-4"></div>
+          <div className="text-cottage-gray">Loading...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-md mx-auto mt-20">
+        <div className="bg-cottage-red/10 border border-cottage-red rounded-xl p-6 text-center">
+          <div className="text-cottage-red text-lg mb-2">⚠️ Error</div>
+          <div className="text-cottage-gray">{error}</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="max-w-2xl mx-auto mt-20">
+        <div className="bg-white rounded-xl p-8 shadow-xl border border-cottage-sand text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-cottage-red/10 rounded-full mb-6">
+            <User className="w-10 h-10 text-cottage-red" />
+          </div>
+          <h2 className="text-3xl font-bold text-cottage-charcoal mb-3">Only the admin can edit listings</h2>
+          <p className="text-cottage-gray mb-6">
+            You're logged in as <span className="font-semibold text-cottage-charcoal">{userName}</span>.
+            Only <span className="font-semibold text-cottage-charcoal">{room?.adminName}</span> can manage listings for this room.
+          </p>
+          <button
+            onClick={() => {
+              localStorage.removeItem(`cottageAdminName:${joinCode}`)
+              setNamePrompt(true)
+              setUserName('')
+              setRoom(null)
+              setIsAdmin(false)
+            }}
+            className="px-6 py-3 bg-cottage-green hover:bg-cottage-green/90 text-white font-semibold rounded-lg transition-colors shadow-md"
+          >
+            Log in as a different user
+          </button>
         </div>
       </div>
     )

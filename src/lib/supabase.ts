@@ -59,6 +59,17 @@ export async function getDefaultRoom() {
   return getRoomByJoinCode(DEFAULT_JOIN_CODE)
 }
 
+export async function getRoomById(roomId: string) {
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('*')
+    .eq('id', roomId)
+    .single()
+
+  if (error) throw error
+  return data as Room
+}
+
 export async function createRoom(room: Database['public']['Tables']['rooms']['Insert']) {
   const { name, joinCode, adminName } = room
 
