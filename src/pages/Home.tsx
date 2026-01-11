@@ -81,8 +81,9 @@ export default function Home({ roomId }: HomeProps) {
       setVoteCounts(counts)
     } catch (err) {
       console.error('Error loading data:', err)
-      // Only set error if it's an actual error, not just empty results
-      setError('Failed to load cottage options.')
+      // Show the actual error message
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load cottage options.'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -128,7 +129,8 @@ export default function Home({ roomId }: HomeProps) {
       setVoteCounts(counts)
     } catch (err) {
       console.error('Error saving vote:', err)
-      alert('Failed to save your vote. Please try again.')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save your vote. Please try again.'
+      alert(errorMessage)
     }
   }
 
@@ -313,17 +315,26 @@ export default function Home({ roomId }: HomeProps) {
             <div className="inline-flex items-center justify-center w-20 h-20 bg-cottage-sand rounded-full mb-6">
               <Plus className="w-10 h-10 text-cottage-gray" />
             </div>
-            <h2 className="text-2xl font-bold text-cottage-charcoal mb-3">No Listings Yet</h2>
+            <h2 className="text-2xl font-bold text-cottage-charcoal mb-3">No listings yet</h2>
             <p className="text-cottage-gray mb-8 max-w-md mx-auto">
-              Get started by adding cottage options for your group to vote on.
+              Ask the admin to add cottages, then voting will appear
             </p>
-            <button
-              onClick={() => navigate(`/r/${joinCode}/admin`)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-cottage-green hover:bg-cottage-green/90 text-white font-semibold rounded-lg transition-colors shadow-lg"
-            >
-              <Plus className="w-5 h-5" />
-              Add Listings
-            </button>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => navigate(`/r/${joinCode}/admin`)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-cottage-green hover:bg-cottage-green/90 text-white font-semibold rounded-lg transition-colors shadow-lg"
+              >
+                <Plus className="w-5 h-5" />
+                Add listings
+              </button>
+              <button
+                onClick={handleCopyShareableLink}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-cottage-sand/30 border border-cottage-sand text-cottage-charcoal font-semibold rounded-lg transition-colors shadow-lg"
+              >
+                <Copy className="w-5 h-5" />
+                Copy invite link
+              </button>
+            </div>
           </div>
         ) : (
           <>

@@ -104,7 +104,7 @@ function RoomLoader() {
         <Routes>
           <Route path="/" element={<Home roomId={room.id} />} />
           <Route path="/results" element={<Results roomId={room.id} />} />
-          <Route path="/admin" element={<Admin roomId={room.id} />} />
+          <Route path="/admin" element={<Admin roomId={room.id} joinCode={joinCode || DEFAULT_JOIN_CODE} />} />
         </Routes>
       </main>
     </>
