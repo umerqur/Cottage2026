@@ -40,8 +40,8 @@ export default function Landing() {
       // Store admin name in localStorage for this room
       localStorage.setItem(`cottageVoterName:${joinCode}`, adminName.trim())
 
-      // Redirect to the new room
-      navigate(`/r/${joinCode}`)
+      // Redirect to the new room with created flag
+      navigate(`/r/${joinCode}?created=true`)
     } catch (err) {
       console.error('Error creating room:', err)
       // Display the actual error message from Supabase

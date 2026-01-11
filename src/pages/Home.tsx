@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { User, Share2, Plus } from 'lucide-react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { User, Share2, Plus, CheckCircle, Copy } from 'lucide-react'
 import CottageCard from '../components/CottageCard'
 import CottageModal from '../components/CottageModal'
 import { getOptions, getUserVote, upsertVote, getVotes } from '../lib/supabase'
@@ -13,6 +13,7 @@ interface HomeProps {
 export default function Home({ roomId }: HomeProps) {
   const { joinCode } = useParams<{ joinCode: string }>()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [options, setOptions] = useState<CottageOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -21,10 +22,22 @@ export default function Home({ roomId }: HomeProps) {
   const [userVotes, setUserVotes] = useState<Record<string, VoteValue>>({})
   const [selectedOption, setSelectedOption] = useState<CottageOption | null>(null)
   const [voteCounts, setVoteCounts] = useState<Record<string, { yes: number; maybe: number; no: number }>>({})
+  const [showCreatedBanner, setShowCreatedBanner] = useState(false)
+
+  useEffect(() => {
+    // Check if room was just created
+    const created = searchParams.get('created')
+    if (created === 'true') {
+      setShowCreatedBanner(true)
+      // Remove the query parameter from URL
+      searchParams.delete('created')
+      setSearchParams(searchParams, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
 
   useEffect(() => {
     // Check localStorage for saved name (room-scoped)
-    const savedName = localStorage.getItem(`cottageVoterName:${roomId}`)
+    const savedName = localStorage.getItem(`cottageVoterName:${joinCode}`)
     if (savedName) {
       setVoterName(savedName)
       setNamePrompt(false)
@@ -32,7 +45,7 @@ export default function Home({ roomId }: HomeProps) {
     } else {
       setLoading(false)
     }
-  }, [roomId])
+  }, [joinCode])
 
   const loadData = async (name: string) => {
     try {
@@ -69,7 +82,7 @@ export default function Home({ roomId }: HomeProps) {
     } catch (err) {
       console.error('Error loading data:', err)
       // Only set error if it's an actual error, not just empty results
-      setError('Failed to load cottage options. Please check your connection.')
+      setError('Failed to load cottage options.')
     } finally {
       setLoading(false)
     }
@@ -80,7 +93,7 @@ export default function Home({ roomId }: HomeProps) {
 
     const trimmedName = name.trim()
     setVoterName(trimmedName)
-    localStorage.setItem(`cottageVoterName:${roomId}`, trimmedName)
+    localStorage.setItem(`cottageVoterName:${joinCode}`, trimmedName)
     setNamePrompt(false)
     loadData(trimmedName)
   }
@@ -184,8 +197,83 @@ export default function Home({ roomId }: HomeProps) {
     )
   }
 
+  const handleCopyJoinCode = () => {
+    navigator.clipboard.writeText(joinCode || '').then(() => {
+      alert('Join code copied to clipboard!')
+    }).catch(() => {
+      alert('Failed to copy join code')
+    })
+  }
+
+  const handleCopyShareableLink = () => {
+    const shareableUrl = `${window.location.origin}/r/${joinCode}`
+    navigator.clipboard.writeText(shareableUrl).then(() => {
+      alert('Shareable link copied to clipboard!')
+    }).catch(() => {
+      alert('Failed to copy link')
+    })
+  }
+
   return (
     <div>
+      {/* Room Created Success Banner */}
+      {showCreatedBanner && (
+        <div className="mb-6 -mt-6 -mx-6 px-6 py-4 bg-gradient-to-r from-cottage-green to-cottage-green/90 border-b-4 border-cottage-green shadow-lg">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <CheckCircle className="w-8 h-8 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-white mb-2">Room Created Successfully!</h3>
+                <p className="text-white/90 mb-4">Share this join code or link with your group to start voting together.</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                  {/* Join Code */}
+                  <div className="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/20">
+                    <div className="text-white/80 text-sm font-medium mb-2">Join Code</div>
+                    <div className="flex items-center justify-between gap-3">
+                      <code className="text-2xl font-bold text-white tracking-wider">{joinCode}</code>
+                      <button
+                        onClick={handleCopyJoinCode}
+                        className="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors border border-white/30"
+                      >
+                        <Copy className="w-4 h-4" />
+                        <span className="text-sm font-medium">Copy</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Shareable Link */}
+                  <div className="bg-white/10 backdrop-blur rounded-lg p-4 border border-white/20">
+                    <div className="text-white/80 text-sm font-medium mb-2">Shareable Link</div>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-sm text-white/90 font-mono truncate">
+                        {window.location.origin}/r/{joinCode}
+                      </div>
+                      <button
+                        onClick={handleCopyShareableLink}
+                        className="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors border border-white/30 flex-shrink-0"
+                      >
+                        <Copy className="w-4 h-4" />
+                        <span className="text-sm font-medium">Copy</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowCreatedBanner(false)}
+                  className="text-white/80 hover:text-white text-sm font-medium underline"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Premium Header Bar */}
       <div className="mb-8 -mt-6 -mx-6 px-6 py-5 bg-white border-b border-cottage-sand shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -205,7 +293,7 @@ export default function Home({ roomId }: HomeProps) {
               </span>
               <button
                 onClick={() => {
-                  localStorage.removeItem(`cottageVoterName:${roomId}`)
+                  localStorage.removeItem(`cottageVoterName:${joinCode}`)
                   setNamePrompt(true)
                   setVoterName('')
                 }}
