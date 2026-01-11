@@ -99,7 +99,7 @@ export async function getOptions(roomId: string) {
   const { data, error } = await supabase
     .from('options')
     .select('*')
-    .eq('roomId', roomId)
+    .eq('room_id', roomId)
     .order('code', { ascending: true })
 
   if (error) throw error
@@ -118,9 +118,25 @@ export async function getOption(id: string) {
 }
 
 export async function createOption(option: Database['public']['Tables']['options']['Insert']) {
+  // Convert camelCase to snake_case for Supabase
   const { data, error } = await supabase
     .from('options')
-    .insert(option)
+    .insert({
+      room_id: option.roomId,
+      code: option.code,
+      nickname: option.nickname,
+      title: option.title,
+      location: option.location,
+      price_night: option.priceNight,
+      total_estimate: option.totalEstimate,
+      guests: option.guests,
+      beds: option.beds,
+      baths: option.baths,
+      perks: option.perks,
+      airbnb_url: option.airbnbUrl,
+      image_urls: option.imageUrls,
+      notes: option.notes,
+    })
     .select()
     .single()
 
@@ -129,9 +145,24 @@ export async function createOption(option: Database['public']['Tables']['options
 }
 
 export async function updateOption(id: string, option: Database['public']['Tables']['options']['Update']) {
+  // Convert camelCase to snake_case for Supabase
+  const updatePayload: Record<string, any> = {}
+  if (option.nickname !== undefined) updatePayload.nickname = option.nickname
+  if (option.title !== undefined) updatePayload.title = option.title
+  if (option.location !== undefined) updatePayload.location = option.location
+  if (option.priceNight !== undefined) updatePayload.price_night = option.priceNight
+  if (option.totalEstimate !== undefined) updatePayload.total_estimate = option.totalEstimate
+  if (option.guests !== undefined) updatePayload.guests = option.guests
+  if (option.beds !== undefined) updatePayload.beds = option.beds
+  if (option.baths !== undefined) updatePayload.baths = option.baths
+  if (option.perks !== undefined) updatePayload.perks = option.perks
+  if (option.airbnbUrl !== undefined) updatePayload.airbnb_url = option.airbnbUrl
+  if (option.imageUrls !== undefined) updatePayload.image_urls = option.imageUrls
+  if (option.notes !== undefined) updatePayload.notes = option.notes
+
   const { data, error } = await supabase
     .from('options')
-    .update(option)
+    .update(updatePayload)
     .eq('id', id)
     .select()
     .single()
@@ -145,8 +176,8 @@ export async function getVotes(roomId: string) {
   const { data, error } = await supabase
     .from('votes')
     .select('*')
-    .eq('roomId', roomId)
-    .order('createdAt', { ascending: false })
+    .eq('room_id', roomId)
+    .order('created_at', { ascending: false })
 
   if (error) throw error
   return data as Vote[]
@@ -156,9 +187,9 @@ export async function getUserVote(roomId: string, voterName: string, optionId: s
   const { data, error } = await supabase
     .from('votes')
     .select('*')
-    .eq('roomId', roomId)
-    .eq('voterName', voterName)
-    .eq('optionId', optionId)
+    .eq('room_id', roomId)
+    .eq('voter_name', voterName)
+    .eq('option_id', optionId)
     .maybeSingle()
 
   if (error) throw error
@@ -173,7 +204,7 @@ export async function upsertVote(vote: Database['public']['Tables']['votes']['In
     // Update existing vote
     const { data, error } = await supabase
       .from('votes')
-      .update({ voteValue: vote.voteValue })
+      .update({ vote_value: vote.voteValue })
       .eq('id', existing.id)
       .select()
       .single()
@@ -181,10 +212,15 @@ export async function upsertVote(vote: Database['public']['Tables']['votes']['In
     if (error) throw error
     return data as Vote
   } else {
-    // Create new vote
+    // Create new vote - convert camelCase to snake_case
     const { data, error } = await supabase
       .from('votes')
-      .insert(vote)
+      .insert({
+        room_id: vote.roomId,
+        voter_name: vote.voterName,
+        option_id: vote.optionId,
+        vote_value: vote.voteValue,
+      })
       .select()
       .single()
 
@@ -197,7 +233,7 @@ export async function deleteAllVotes(roomId: string) {
   const { error } = await supabase
     .from('votes')
     .delete()
-    .eq('roomId', roomId)
+    .eq('room_id', roomId)
     .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all in room
 
   if (error) throw error
